@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 최애 OK캐쉬백 혜택은? | 16강 토너먼트</title>
+    <meta name="description" content="16가지 OK캐쉬백 제휴 혜택 중 당신의 최애를 찾아보세요! 16강 토너먼트 게임.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Start Screen -->
+        <section id="start-screen" class="screen active">
+            <div class="hero-content">
+                <div class="badge">OK Cashbag Tournament</div>
+                <h1>내 최애<br><span class="highlight">OK캐쉬백 혜택</span>은?</h1>
+                <p>16강 토너먼트를 통해 나만의 최고의 혜택을 찾아보세요.</p>
+                <button id="start-btn" class="primary-btn">게임 시작하기</button>
+            </div>
+            <div class="floating-cards">
+                <div class="f-card f1"></div>
+                <div class="f-card f2"></div>
+                <div class="f-card f3"></div>
+            </div>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="game-screen" class="screen">
+            <header class="game-header">
+                <div class="round-info">
+                    <span id="current-round-text">16강</span>
+                    <span id="current-match-text">1 / 8</span>
+                </div>
+                <div class="progress-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+            </header>
+
+            <div class="vs-container">
+                <div class="match-vs">VS</div>
+                <div id="card-left" class="benefit-card left">
+                    <!-- Dynamic Content -->
+                </div>
+                <div id="card-right" class="benefit-card right">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="result-screen" class="screen">
+            <div class="result-container">
+                <div class="confetti-container" id="confetti"></div>
+                <div class="trophy-icon">🏆</div>
+                <h2>당신의 최애 혜택은!</h2>
+                <div id="winner-card" class="winner-card">
+                    <!-- Winner dynamic content -->
+                </div>
+                
+                <div class="stats-section">
+                    <h3>유저들의 픽 순위</h3>
+                    <div id="user-stats" class="stats-list">
+                        <!-- Stats dynamic content -->
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="share-btn" class="secondary-btn">결과 공유하기</button>
+                    <button id="retry-btn" class="outline-btn">다시 하기</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
