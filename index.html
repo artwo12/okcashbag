@@ -234,16 +234,6 @@ input.field {
 input.field:focus { border-color: var(--p); background: rgba(232,0,61,0.06); }
 input.field::placeholder { color: var(--mut); }
 
-/* ━━━━━━ RANK ITEMS ━━━━━━ */
-.rank-item {
-  display: flex; align-items: center; gap: 13px;
-  background: var(--s2); border-radius: 14px;
-  padding: 13px 15px; margin-bottom: 8px;
-  border: 1px solid var(--b1);
-  transition: border-color 0.2s;
-}
-.rank-item.mine { border-color: rgba(232,0,61,0.4); background: rgba(232,0,61,0.07); }
-
 /* ━━━━━━ PROGRESS BAR ━━━━━━ */
 .prog { height: 5px; background: var(--b1); border-radius: 3px; overflow: hidden; }
 .prog-fill { height: 100%; background: var(--pg); border-radius: 3px; transition: width 1s linear; }
@@ -294,14 +284,6 @@ input.field::placeholder { color: var(--mut); }
 
 /* Divider */
 .div { height: 1px; background: var(--b1); margin: 4px 0; width: 100%; max-width: 360px; }
-
-/* Scroll wrapper for leaderboard */
-#lb-scroll {
-  width: 100%; flex: 1; overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;
-}
-#lb-scroll::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
@@ -327,16 +309,15 @@ input.field::placeholder { color: var(--mut); }
     <div id="intro-empty" style="display:none; font-size:14px; color:var(--mut); margin-top:10px;">내일 새벽 3회 충전돼요 ☀️</div>
   </div>
 
-  <!-- Weekly Event Banner -->
+  <!-- Event Banner -->
   <div style="width:100%; max-width:360px; background:linear-gradient(135deg,rgba(232,0,61,0.18),rgba(232,0,61,0.06)); border:1px solid rgba(232,0,61,0.35); border-radius:16px; padding:14px 16px; margin-bottom:18px; position:relative; overflow:hidden;">
-    <div style="position:absolute;top:-18px;right:-10px;font-size:60px;opacity:0.07;line-height:1;">🏆</div>
+    <div style="position:absolute;top:-18px;right:-10px;font-size:60px;opacity:0.07;line-height:1;">🎯</div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-      <span style="background:var(--p);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:100px;">DAILY PRIZE</span>
+      <span style="background:var(--p);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:100px;">CHALLENGE</span>
     </div>
-    <div style="font-size:15px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:5px;">매일 1명에게 SK하이닉스 소숫점 주식!</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.6;">
-      매일 최고점 <strong style="color:rgba(255,255,255,0.85);">1명</strong>에게<br>
-      SK하이닉스 소숫점 주식 <span style="color:rgba(255,255,255,0.45);">(10만원 상당)</span> 당첨
+    <div style="font-size:15px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:5px;">내 최고 스코어에 도전하세요!</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.8;">
+      손가락을 떼지 않고 <strong style="color:rgba(255,255,255,0.85);">완벽한 S</strong>를 그려보세요
     </div>
   </div>
 
@@ -344,7 +325,6 @@ input.field::placeholder { color: var(--mut); }
   <div style="width:100%; max-width:360px; display:flex; flex-direction:column; gap:10px;">
     <button class="btn btn-p btn-pulse" id="btn-start">🎯 도전 시작!</button>
     <button class="btn btn-p btn-pulse" id="btn-ad-intro" style="display:none;">📺 광고 보고 +2회 획득</button>
-    <button class="btn btn-s"            id="btn-lb-intro">🏆 명예의 전당</button>
   </div>
 
   <!-- Tip -->
@@ -366,8 +346,16 @@ input.field::placeholder { color: var(--mut); }
 
 <!-- ══════════════ GAME ══════════════ -->
 <div id="s-game" class="screen">
-  <div style="text-align:center; margin-bottom:16px;">
-    <div style="font-size:11px; font-weight:700; color:var(--mut); letter-spacing:2.5px; text-transform:uppercase;">DRAW THE S</div>
+  <div style="text-align:center; margin-bottom:14px;">
+    <div style="font-size:11px; font-weight:700; color:var(--mut); letter-spacing:2.5px; text-transform:uppercase; margin-bottom:10px;">DRAW THE S</div>
+    <!-- 최고 기록 + 응원 멘트 -->
+    <div id="game-best-wrap" style="display:inline-flex; flex-direction:column; align-items:center; gap:4px;">
+      <div style="display:flex; align-items:center; gap:7px;">
+        <span style="font-size:11px; color:rgba(255,255,255,0.35); font-weight:600; letter-spacing:1px;">내 최고 기록</span>
+        <span id="game-best-score" style="font-size:16px; font-weight:900; color:var(--p);">--</span>
+      </div>
+      <div id="game-best-msg" style="font-size:12px; color:rgba(255,255,255,0.40); font-weight:500;"></div>
+    </div>
   </div>
 
   <div id="canvas-outer">
@@ -427,18 +415,8 @@ input.field::placeholder { color: var(--mut); }
       <span style="font-size:11px; font-weight:400; opacity:0.75;">5초 광고 시청 후 2번 더 도전!</span>
     </button>
 
-    <!-- Share -->
-    <button class="btn btn-s" id="btn-share" style="height:52px; gap:8px;">
-      <span style="font-size:18px;">📤</span>
-      <span style="font-size:15px; font-weight:700;">친구에게 공유하기</span>
-      <span style="font-size:11px; font-weight:400; opacity:0.55; margin-left:2px;">+1회</span>
-    </button>
-
     <div style="display:flex; gap:9px;">
-      <button class="btn btn-s" id="btn-lb-result" style="flex:1; height:52px; font-size:14px;">
-        🏆 순위 보기
-      </button>
-      <button class="btn btn-s" id="btn-retry"     style="flex:1; height:52px; font-size:14px;">
+      <button class="btn btn-s" id="btn-retry" style="flex:1; height:52px; font-size:14px;">
         🔄 다시 도전
       </button>
     </div>
@@ -446,45 +424,18 @@ input.field::placeholder { color: var(--mut); }
 </div>
 
 <!-- ══════════════ LEADERBOARD ══════════════ -->
-<div id="s-leaderboard" class="screen" style="justify-content:flex-start; overflow:hidden; padding-top:0;">
-  <div style="width:100%; max-width:360px; display:flex; flex-direction:column; height:100%; overflow:hidden;">
-    <!-- Header -->
-    <div style="display:flex; align-items:center; padding-top:calc(var(--sat) + 12px); margin-bottom:18px; flex-shrink:0;">
-      <button class="btn btn-g" id="btn-back" style="width:auto; padding:0 12px;">← 뒤로</button>
-      <div class="t-title" style="font-size:22px; flex:1; text-align:center;">🏆 명예의 전당</div>
-      <div style="width:60px;"></div>
-    </div>
-
-    <div class="div" style="margin-bottom:14px;"></div>
-
-    <!-- Scrollable list -->
-    <div id="lb-scroll">
-      <div id="lb-list"></div>
-    </div>
-  </div>
-</div>
-
 <!-- ══════════════ AD ZONE ══════════════ -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1117559813052559" crossorigin="anonymous"></script>
 <div id="ad-zone">
-  <!-- AD_URL 교체: href="#" → 실제 광고 랜딩 URL로 변경 -->
-  <a id="ad-banner" href="#" target="_blank" rel="noopener">
+  <a id="ad-banner" style="border:none; background:none; display:flex; align-items:center; justify-content:center; width:320px; height:72px;">
     <span id="ad-label">광고</span>
-    <span id="ad-content">광고 게재 320×72</span>
+    <!-- Game_ads_test>320x72 -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:320px;height:72px"
+         data-ad-client="ca-pub-1117559813052559"
+         data-ad-slot="3897909216"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </a>
-</div>
-
-<!-- ══════════════ MODAL: NICKNAME ══════════════ -->
-<div class="ov" id="ov-nick">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="t-title" style="font-size:22px; margin-bottom:6px;">닉네임을 입력하세요</div>
-    <div class="t-body"  style="color:var(--mut); font-size:14px; margin-bottom:18px;">순위표에 표시될 이름이에요</div>
-    <input type="text" id="nick-input" class="field" placeholder="닉네임 (최대 10자)" maxlength="10">
-    <div style="display:flex; gap:9px; margin-top:12px;">
-      <button class="btn btn-g" id="btn-nick-skip" style="flex:1; height:52px;">건너뛰기</button>
-      <button class="btn btn-p" id="btn-nick-save" style="flex:1; height:52px;">저장하기</button>
-    </div>
-  </div>
 </div>
 
 <!-- ══════════════ MODAL: AD ══════════════ -->
@@ -492,7 +443,7 @@ input.field::placeholder { color: var(--mut); }
   <div class="sheet" style="text-align:center;">
     <div class="sheet-handle"></div>
     <div class="t-title" style="font-size:22px; margin-bottom:6px;">광고 시청 중</div>
-    <div class="t-body"  style="color:var(--mut); font-size:14px; margin-bottom:22px;">끝까지 보면 3번 더 도전할 수 있어요!</div>
+    <div class="t-body"  style="color:var(--mut); font-size:14px; margin-bottom:22px;">끝까지 보면 2번 더 도전할 수 있어요!</div>
 
     <!-- Mock ad content -->
     <div style="background:var(--s2); border-radius:14px; height:80px; margin-bottom:20px;
@@ -529,10 +480,7 @@ input.field::placeholder { color: var(--mut); }
 // GLOBAL STATE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const G = {
-  nickname:      localStorage.getItem('sk_nick') || '',
   currentScore:  0,
-  pendingScore:  0,
-  pendingIsHigh: false,
   isDrawing:     false,
   drawn:         [],
   template:      [],
@@ -576,9 +524,9 @@ function addExtra(n)  {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function getScores()  { try { return JSON.parse(localStorage.getItem('sk_scores') || '[]'); } catch { return []; } }
 function topScore()   { const s = getScores(); return s.length ? s[0].score : 0; }
-function addScore(score, nick) {
+function addScore(score) {
   const s = getScores();
-  s.push({ score, nick: nick || '익명', date: new Date().toLocaleDateString('ko-KR') });
+  s.push({ score, date: new Date().toLocaleDateString('ko-KR') });
   s.sort((a, b) => b.score - a.score);
   s.splice(10);
   localStorage.setItem('sk_scores', JSON.stringify(s));
@@ -889,12 +837,7 @@ function finishDraw() {
 
 function showResult(score) {
   const isHigh = score > topScore();
-  G.pendingScore  = score;
-  G.pendingIsHigh = isHigh;
-
-  if (!G.nickname) { openOv('nick'); return; }
-
-  addScore(score, G.nickname);
+  addScore(score);
   renderResult(score, isHigh);
 }
 
@@ -1054,31 +997,6 @@ function launchConfetti() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // LEADERBOARD
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function renderLeaderboard() {
-  const scores = getScores();
-  const el     = document.getElementById('lb-list');
-  const medals = ['🥇','🥈','🥉'];
-
-  if (!scores.length) {
-    el.innerHTML = `<div style="text-align:center;color:var(--mut);padding:50px 0 20px;font-size:15px;line-height:1.8;">
-      아직 기록이 없어요!<br>첫 번째 도전자가 되어보세요 🎯</div>`;
-    return;
-  }
-
-  el.innerHTML = scores.map((s, i) => `
-    <div class="rank-item ${s.nick === G.nickname ? 'mine' : ''}">
-      <div style="font-size:22px;width:34px;text-align:center;">${medals[i] || (i+1)}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(s.nick)}</div>
-        <div style="font-size:12px;color:var(--mut);">${s.date}</div>
-      </div>
-      <div style="font-size:20px;font-weight:800;color:var(--p);flex-shrink:0;">${s.score.toFixed(2)}%</div>
-    </div>
-  `).join('');
-}
-
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COUNTDOWN
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1152,7 +1070,7 @@ function runAd() {
     if (t <= 0) {
       clearInterval(G.adTimer);
       doneEl.disabled    = false;
-      doneEl.textContent = '✓ 완료! 3회 추가 받기';
+      doneEl.textContent = '✓ 완료! 2회 추가 받기';
       sfx('success');
     }
   }, 1000);
@@ -1170,8 +1088,31 @@ function startGame() {
       setupCanvas();
       bindCanvas();
       startBGM();
+      renderGameBest(); // 최고 기록 + 응원 멘트
     }, 120);
   });
+}
+
+function renderGameBest() {
+  const best    = topScore();
+  const scoreEl = document.getElementById('game-best-score');
+  const msgEl   = document.getElementById('game-best-msg');
+  const msgs0   = ['첫 기록을 세워보세요! 🔥', '지금 바로 도전! 최고 기록의 주인공이 되세요 ✨'];
+  const msgs    = [
+    '이번엔 꼭 경신해봐요! 💪',
+    '조금만 더 집중하면 갱신할 수 있어요 🎯',
+    '한 획의 차이! 더 정밀하게 그려보세요 ✍️',
+    '최고 기록 경신까지 한 걸음! 힘내요 🚀',
+    '지금이 바로 기록 경신의 순간 ⚡',
+    '천천히, 그리고 정확하게! 할 수 있어요 🌟',
+  ];
+  if (!best) {
+    scoreEl.textContent = '--';
+    msgEl.textContent   = msgs0[Math.floor(Math.random() * msgs0.length)];
+  } else {
+    scoreEl.textContent = best.toFixed(2) + '%';
+    msgEl.textContent   = msgs[Math.floor(Math.random() * msgs.length)];
+  }
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1224,29 +1165,14 @@ function doShare() {
 document.getElementById('btn-start').addEventListener('click', () => {
   initAudio(); startGame();
 });
-document.getElementById('btn-lb-intro').addEventListener('click', () => {
-  renderLeaderboard(); go('leaderboard');
-});
-
 document.getElementById('btn-ad-intro').addEventListener('click', () => {
   initAudio(); openOv('ad'); runAd();
 });
 
-// Leaderboard
-document.getElementById('btn-back').addEventListener('click', () => {
-  refreshIntro(); go('intro');
-});
-
 // Result
-document.getElementById('btn-share').addEventListener('click', doShare);
-
 document.getElementById('btn-retry').addEventListener('click', () => {
   if (remaining() <= 0) return;
   initAudio(); startGame();
-});
-
-document.getElementById('btn-lb-result').addEventListener('click', () => {
-  renderLeaderboard(); go('leaderboard');
 });
 
 document.getElementById('btn-ad').addEventListener('click', () => {
@@ -1265,33 +1191,19 @@ document.getElementById('btn-ad-cancel').addEventListener('click', () => {
   clearInterval(G.adTimer); closeOv('ad');
 });
 
-// Nickname modal
-document.getElementById('btn-nick-save').addEventListener('click', () => {
-  const nick = (document.getElementById('nick-input').value || '').trim() || '익명';
-  G.nickname = nick;
-  localStorage.setItem('sk_nick', nick);
-  closeOv('nick');
-  addScore(G.pendingScore, nick);
-  renderResult(G.pendingScore, G.pendingIsHigh);
-});
-document.getElementById('btn-nick-skip').addEventListener('click', () => {
-  G.nickname = '익명';
-  closeOv('nick');
-  addScore(G.pendingScore, '익명');
-  renderResult(G.pendingScore, G.pendingIsHigh);
-});
-
-// Enter key in nickname
-document.getElementById('nick-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('btn-nick-save').click();
-});
-
 // Celebration modal
 document.getElementById('btn-cel-ok').addEventListener('click', () => closeOv('cel'));
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // INIT
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 구 알고리즘으로 저장된 99.5% 초과 기록 자동 정리
+(function cleanLegacyScores() {
+  const s = getScores().filter(r => r.score <= 99.5);
+  localStorage.setItem('sk_scores', JSON.stringify(s));
+})();
+
 refreshIntro();
 </script>
 </body>
