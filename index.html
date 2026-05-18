@@ -4,15 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>SK 그리기</title>
-<!-- H5 Games Ads -->
-<script async
-  data-adbreak-test="on"
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-123456789"
-  crossorigin="anonymous"></script>
-<script>
-  window.adsbygoogle = window.adsbygoogle || [];
-  var adBreak = adConfig = function(o) { adsbygoogle.push(o); }
-</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { height: 100%; }
@@ -241,16 +232,19 @@ body {
 .ad-skip-btn.show { display: block; }
 .ad-content {
   flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; padding: 24px; gap: 20px;
+  align-items: center; justify-content: center; padding: 24px; gap: 14px;
 }
-.ad-brand-logo {
-  width: 68px; height: 68px; border-radius: 18px;
-  background: linear-gradient(135deg,#4285F4,#34A853);
-  display: flex; align-items: center; justify-content: center; font-size: 30px;
+.etms-frame-wrap {
+  width: 300px; height: 330px; border-radius: 18px; overflow: hidden;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
 }
-.ad-headline { font-size: 22px; font-weight: 700; color: #fff; text-align: center; line-height: 1.35; }
-.ad-body     { font-size: 14px; color: rgba(255,255,255,.55); text-align: center; line-height: 1.65; max-width: 280px; }
-.ad-cta      { background: #4285F4; color: #fff; border: none; border-radius: 12px; padding: 14px 36px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.etms-frame-wrap.loading::before {
+  content: '광고 불러오는 중...'; color: rgba(255,255,255,.48); font-size: 13px;
+}
+#etms-frame { display: block; width: 300px; height: 330px; border: 0; background: transparent; }
+.etms-frame-wrap.loading #etms-frame { display: none; }
+.etms-guide { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.6; text-align: center; }
 .ad-bottombar { padding: 12px 16px 28px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .ad-timer-row { display: flex; align-items: center; gap: 10px; width: 100%; }
 .ad-timer-lbl { font-size: 12px; color: rgba(255,255,255,.4); min-width: 58px; }
@@ -442,22 +436,22 @@ body {
   <!-- ═══ AD ═══ -->
   <div class="screen hidden" id="screen-ad">
     <div class="ad-topbar">
-      <div class="ad-topbar-label">광고 · Google Ads</div>
+      <div class="ad-topbar-label">광고 · ETMS</div>
       <button class="ad-skip-btn" id="ad-skip-btn" onclick="skipAd()">건너뛰기 ›</button>
     </div>
     <div class="ad-content">
-      <div class="ad-brand-logo">🛍️</div>
-      <div class="ad-headline">지금 바로 혜택을<br>확인해보세요</div>
-      <div class="ad-body">OCB와 함께하는 특별한 파트너 혜택.<br>포인트 적립부터 할인까지 한 곳에서.</div>
-      <button class="ad-cta" onclick="handleAdClick()">혜택 보러 가기</button>
+      <div class="etms-frame-wrap loading" id="etms-frame-wrap">
+        <iframe id="etms-frame" title="ETMS 광고" width="300" height="330" scrolling="no"></iframe>
+      </div>
+      <div class="etms-guide" id="etms-guide">광고가 표시되면 완료 버튼을 눌러 참여 기회를 받으세요.</div>
     </div>
     <div class="ad-bottombar">
       <div class="ad-timer-row">
-        <div class="ad-timer-lbl" id="ad-timer-lbl">30초 남음</div>
+        <div class="ad-timer-lbl" id="ad-timer-lbl">대기 중</div>
         <div class="ad-bar-bg"><div class="ad-bar-fill" id="ad-bar"></div></div>
       </div>
-      <div class="ad-reward-note">시청 완료 시 <strong>참여 기회 +2</strong> 자동 지급</div>
-      <div class="ad-google-tag">RewardedInterstitialAd · ca-app-pub-XXXXXXXX</div>
+      <div class="ad-reward-note">광고 확인 시 <strong>참여 기회 +2</strong> 지급</div>
+      <div class="ad-google-tag">ETMS · mobwithad</div>
     </div>
   </div>
 
@@ -980,82 +974,120 @@ function showScreen(id) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GOOGLE RewardedInterstitialAd
+   ETMS AD
 ══════════════════════════════════════════════════════════════ */
-let rewardedInterstitialAd=null;
+const ETMS = {
+  domain: 'https://dev.mobwithad.com',
+  apiPath: 'todayNews',
+  zoneId: '489780',
+  zoneType: '01',
+  width: 300,
+  height: 330,
+};
+const ETMS_ORIGINS = [
+  'https://dev.mobwithad.com',
+  'https://www.mobwithad.com',
+  'https://services.mobwith.co.kr',
+  'https://block.mobwithad.com',
+];
+let etmsLoaded=false;
+let etmsRewarded=false;
+let etmsLandingMs=0;
 let adInterval=null, adElapsed=0;
 
-function loadRewardedInterstitialAd(onLoaded, onFailed) {
-  setTimeout(() => {
-    if (Math.random()>0.03) {
-      rewardedInterstitialAd = {
-        _fsCb: null,
-        setFullScreenContentCallback(cb) { this._fsCb=cb; },
-        show(ctx, rl) {
-          this._fsCb?.onAdShowedFullScreenContent();
-          this._fsCb?.onAdImpression();
-          runAdPlayback(this, rl);
-        }
-      };
-      onLoaded(rewardedInterstitialAd);
-    } else {
-      rewardedInterstitialAd=null;
-      onFailed({getMessage:()=>'Network error'});
-    }
-  }, 550);
+function detectOsType() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'ios' : 'android';
 }
 
-function runAdPlayback(ad, rl) {
-  adElapsed=0; const total=GS.AD_DURATION_S;
-  document.getElementById('ad-bar').style.width='0%';
-  document.getElementById('ad-timer-lbl').textContent=total+'초 남음';
-  document.getElementById('ad-skip-btn').classList.remove('show');
+function makeEtmsUrl() {
+  const url = new URL('/api/banner/app/ocb/v1/' + ETMS.apiPath, ETMS.domain);
+  url.searchParams.set('zone', ETMS.zoneId);
+  url.searchParams.set('zone_type', ETMS.zoneType);
+  url.searchParams.set('os_type', detectOsType());
+  url.searchParams.set('is_optout', '0');
+  return url.toString();
+}
+
+function resetEtmsAd() {
+  etmsLoaded=false;
+  etmsRewarded=false;
+  etmsLandingMs=0;
+  adElapsed=0;
   clearInterval(adInterval);
+  document.getElementById('ad-bar').style.width='0%';
+  document.getElementById('ad-timer-lbl').textContent='대기 중';
+  document.getElementById('ad-skip-btn').classList.remove('show');
+  document.getElementById('etms-frame-wrap').classList.add('loading');
+  document.getElementById('etms-guide').textContent='광고가 표시되면 완료 버튼을 눌러 참여 기회를 받으세요.';
+}
+
+function startEtmsProgress() {
+  clearInterval(adInterval);
+  adElapsed=0;
+  const total=5;
+  document.getElementById('ad-skip-btn').textContent='완료 ›';
+  document.getElementById('ad-skip-btn').classList.remove('show');
+  document.getElementById('ad-timer-lbl').textContent=total+'초 후 완료';
   adInterval=setInterval(()=>{
     adElapsed++;
-    const pct=Math.min((adElapsed/total)*100,100);
-    document.getElementById('ad-bar').style.width=pct+'%';
-    document.getElementById('ad-timer-lbl').textContent=Math.max(0,total-adElapsed)+'초 남음';
+    document.getElementById('ad-bar').style.width=Math.min((adElapsed/total)*100,100)+'%';
+    document.getElementById('ad-timer-lbl').textContent=Math.max(0,total-adElapsed)+'초 후 완료';
     if (adElapsed>=total) {
       clearInterval(adInterval);
+      document.getElementById('ad-timer-lbl').textContent='완료 가능';
       document.getElementById('ad-skip-btn').classList.add('show');
-      rl.onUserEarnedReward({getAmount:()=>2,getType:()=>'play'});
     }
   },1000);
 }
 
-function handleAdClick() { rewardedInterstitialAd?._fsCb?.onAdClicked?.(); }
-function skipAd() { if (adElapsed<GS.AD_DURATION_S) return; dismissAd(); }
+function handleEtmsMessage(e) {
+  if (!ETMS_ORIGINS.includes(e.origin)) return;
+  const data = e.data || {};
+  console.log(e.origin + ':' + JSON.stringify(data));
 
-function dismissAd() {
-  clearInterval(adInterval);
-  rewardedInterstitialAd?._fsCb?.onAdDismissedFullScreenContent?.();
-  rewardedInterstitialAd=null;
+  if (data.code === '200') {
+    etmsLoaded=true;
+    document.getElementById('etms-frame-wrap').classList.remove('loading');
+    startEtmsProgress();
+    return;
+  }
+  if (data.code === '204' || data.type === 'noad') {
+    document.getElementById('etms-guide').textContent='표시할 광고가 없습니다. 게임으로 돌아갑니다.';
+    setTimeout(returnFromAd, 700);
+    return;
+  }
+  if (data.type === 'click' && data.detail?.landingURL) {
+    etmsLandingMs=Date.now();
+    window.open(data.detail.landingURL, '_blank');
+  }
+}
+
+window.addEventListener('message', handleEtmsMessage, false);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && etmsLandingMs) {
+    if (Date.now() - etmsLandingMs >= 5000) {
+      etmsRewarded=true;
+      document.getElementById('ad-skip-btn').classList.add('show');
+      document.getElementById('ad-timer-lbl').textContent='완료 가능';
+    }
+    etmsLandingMs=0;
+  }
+});
+
+function skipAd() {
+  if (!etmsLoaded || (adElapsed < 5 && !etmsRewarded)) return;
+  GS.adsToday++;
+  GS.lastAdMs=Date.now();
+  GS.attempts+=2;
+  showRewardToast(()=>returnFromAd());
 }
 
 function requestAd(from) {
   if (!canWatchAd()) return;
   GS.adCalledFrom=from;
+  resetEtmsAd();
   showScreen('ad');
-  loadRewardedInterstitialAd(
-    (ad) => {
-      ad.setFullScreenContentCallback({
-        onAdDismissedFullScreenContent(){},
-        onAdFailedToShowFullScreenContent(){ rewardedInterstitialAd=null; returnFromAd(); },
-        onAdShowedFullScreenContent(){},
-        onAdImpression(){},
-        onAdClicked(){}
-      });
-      ad.show(null,{
-        onUserEarnedReward(ri) {
-          GS.adsToday++; GS.lastAdMs=Date.now(); GS.attempts+=ri.getAmount();
-          dismissAd();
-          showRewardToast(()=>returnFromAd());
-        }
-      });
-    },
-    ()=>returnFromAd()
-  );
+  document.getElementById('etms-frame').src=makeEtmsUrl();
 }
 
 function canWatchAd() {
