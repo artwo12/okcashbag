@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>SK S챌린지</title>
+<!-- H5 Games Ads API -->
+<script async
+  data-ad-frequency-hint="60s"
+  data-adbreak-test="on"
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1117559813052559"
+  crossorigin="anonymous"></script>
+<script>
+  window.adsbygoogle = window.adsbygoogle || [];
+  var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
@@ -405,15 +415,12 @@ input.field::placeholder { color: var(--mut); }
 
 <!-- ══════════════ LEADERBOARD ══════════════ -->
 <!-- ══════════════ AD ZONE ══════════════ -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <div id="ad-zone">
   <span id="ad-label">광고</span>
   <ins class="adsbygoogle"
        style="display:inline-block;width:320px;height:72px"
-       data-ad-client="ca-pub-3940256099942544"
-       data-ad-slot="6300978111"
-       data-adtest="on"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+       data-ad-client="ca-pub-1117559813052559"
+       data-ad-slot="3897909216"></ins>
 </div>
 
 <!-- ══════════════ MODAL: AD ══════════════ -->
@@ -421,20 +428,9 @@ input.field::placeholder { color: var(--mut); }
   <div class="sheet" style="text-align:center;">
     <div class="sheet-handle"></div>
     <div class="t-title" style="font-size:22px; margin-bottom:6px;">광고 시청 중</div>
-    <div class="t-body"  style="color:var(--mut); font-size:14px; margin-bottom:22px;">끝까지 보면 2번 더 도전할 수 있어요!</div>
-
-    <!-- Google 테스트 광고 -->
-    <div style="margin-bottom:20px; display:flex; align-items:center; justify-content:center;">
-      <ins class="adsbygoogle"
-           style="display:inline-block;width:320px;height:72px"
-           data-ad-client="ca-pub-3940256099942544"
-           data-ad-slot="6300978111"
-           data-adtest="on"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-
+    <div class="t-body" style="color:var(--mut); font-size:14px; margin-bottom:28px;">끝까지 보면 2번 더 도전할 수 있어요!</div>
     <div id="ad-num" style="font-size:60px; font-weight:900; color:var(--p); letter-spacing:-2px; margin-bottom:12px; line-height:1;">5</div>
-    <div class="prog" style="margin-bottom:20px; max-width:300px; margin-left:auto; margin-right:auto;">
+    <div class="prog" style="margin-bottom:24px; max-width:300px; margin-left:auto; margin-right:auto;">
       <div class="prog-fill" id="ad-prog" style="width:0%;"></div>
     </div>
     <button class="btn btn-p" id="btn-ad-done" style="margin-bottom:8px;" disabled>시청 완료 후 활성화돼요</button>
@@ -820,7 +816,13 @@ function finishDraw() {
 function showResult(score) {
   const isHigh = score > topScore();
   addScore(score);
-  renderResult(score, isHigh);
+  // 인터스티셜 광고 (결과 화면 전환 시)
+  adBreak({
+    type:     'next',
+    name:     'game-complete',
+    beforeAd: () => {},
+    afterAd:  () => { renderResult(score, isHigh); },
+  });
 }
 
 function renderResult(score, isHigh) {
@@ -1147,21 +1149,36 @@ function doShare() {
 document.getElementById('btn-start').addEventListener('click', () => {
   initAudio(); startGame();
 });
-document.getElementById('btn-ad-intro').addEventListener('click', () => {
-  initAudio(); openOv('ad'); runAd();
-});
-
 // Result
 document.getElementById('btn-retry').addEventListener('click', () => {
   if (remaining() <= 0) return;
   initAudio(); startGame();
 });
 
-document.getElementById('btn-ad').addEventListener('click', () => {
-  initAudio(); openOv('ad'); runAd();
-});
+// 보상형 광고 트리거 (인트로 + 결과 화면 공통)
+function triggerRewardedAd() {
+  initAudio();
+  openOv('ad');
+  runAd();
+  adBreak({
+    type:     'reward',
+    name:     'extra-attempts',
+    beforeAd: () => {},
+    afterAd:  () => {},
+    reward:   () => {
+      addExtra(2);
+      closeOv('ad');
+      clearInterval(G.adTimer);
+      sfx('great');
+      refreshRetryBtn();
+      refreshIntro();
+    },
+  });
+}
+document.getElementById('btn-ad-intro').addEventListener('click', triggerRewardedAd);
+document.getElementById('btn-ad').addEventListener('click',       triggerRewardedAd);
 
-// Ad modal
+// Ad modal — 수동 완료 버튼 (adBreak 미지원 환경 폴백)
 document.getElementById('btn-ad-done').addEventListener('click', () => {
   addExtra(2);
   closeOv('ad');
@@ -1185,6 +1202,12 @@ document.getElementById('btn-cel-ok').addEventListener('click', () => closeOv('c
   const s = getScores().filter(r => r.score <= 99.5);
   localStorage.setItem('sk_scores', JSON.stringify(s));
 })();
+
+// 하단 배너 광고 초기화
+(adsbygoogle = window.adsbygoogle || []).push({});
+
+// H5 Games Ads 설정
+adConfig({ preloadAdBreaks: 'on', sound: 'off' });
 
 refreshIntro();
 </script>
