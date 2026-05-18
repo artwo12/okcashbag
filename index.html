@@ -2,1213 +2,1270 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>SK S챌린지</title>
-<!-- H5 Games Ads API -->
-<script async
-  data-adbreak-test="on"
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-123456789"
-  crossorigin="anonymous"></script>
-<script>
-  window.adsbygoogle = window.adsbygoogle || [];
-  var adBreak = adConfig = function(o) { adsbygoogle.push(o); }
-</script>
-<link rel="preconnect" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>SK 그리기</title>
 <style>
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
-
-/* ━━━━━━ RESET & TOKENS ━━━━━━ */
-*, *::before, *::after {
-  margin: 0; padding: 0; box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  user-select: none;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+  background: #DDDBD6;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100%;
 }
+#app {
+  width: 390px; max-width: 100vw;
+  height: 100svh; min-height: 640px; max-height: 844px;
+  background: #fff; position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.screen.hidden { display: none !important; }
 
 :root {
-  --p:   #E8003D;
-  --pd:  #B5002F;
-  --pg:  linear-gradient(135deg, #E8003D 0%, #FF4D6D 100%);
-  --bg:  #07071A;
-  --s1:  #10102B;
-  --s2:  #181836;
-  --b1:  rgba(255,255,255,0.08);
-  --b2:  rgba(255,255,255,0.14);
-  --txt: #ffffff;
-  --mut: rgba(255,255,255,0.50);
-  --r:   16px;
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-  --ad:  100px;
+  --red: #E8001C; --orange: #FF6B35; --navy: #0D1B40;
+  --text: #111; --muted: #888; --border: #EBEBEB;
+  --bg: #F7F7F5; --green: #14C25A;
 }
 
-html, body {
-  width: 100%; height: 100dvh;
-  overflow: hidden;
-  background: var(--bg);
-  color: var(--txt);
-  font-family: 'Pretendard Variable', -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
+/* ══ WELCOME ══ */
+#screen-welcome {
+  background: var(--navy);
+  align-items: center; justify-content: center; gap: 0; padding: 32px 32px 56px;
+}
+.w-logo { font-size: 80px; font-weight: 900; color: var(--red); letter-spacing: -4px; line-height: 1; margin-bottom: 8px; }
+.w-sub  { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.w-desc { font-size: 14px; color: rgba(255,255,255,.5); margin-bottom: 44px; line-height: 1.7; text-align: center; }
+.tries-pill {
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+  border-radius: 16px; padding: 14px 24px; display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+}
+.tries-pill span { font-size: 14px; color: rgba(255,255,255,.85); }
+.tries-pill strong { color: #fff; }
+.btn-primary {
+  background: var(--red); color: #fff; border: none; border-radius: 16px;
+  padding: 18px 56px; font-size: 17px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: transform .12s, opacity .12s;
+}
+.btn-primary:active { transform: scale(.96); opacity: .9; }
+
+/* ══ GAME ══ */
+#screen-game { background: #fff; }
+
+.game-header {
+  padding: 14px 20px 12px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.level-chip {
+  background: var(--navy); border-radius: 20px; padding: 6px 14px 6px 10px;
+  display: flex; align-items: center;
+}
+.level-num  { font-size: 10px; color: rgba(255,255,255,.45); font-weight: 600; letter-spacing: .5px; }
+.level-char { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -1px; line-height: 1; }
+.hdr-stats  { display: flex; gap: 18px; }
+.hdr-stat   { display: flex; flex-direction: column; align-items: flex-end; }
+.hdr-val    { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1; }
+.hdr-lbl    { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ── TIMER ZONE ── */
+.timer-zone {
+  flex-shrink: 0; padding: 10px 20px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
 }
 
-body {
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,0,61,0.12) 0%, transparent 65%),
-              linear-gradient(180deg, #07071A 0%, #0D0D28 100%);
+/* Urgent status text above the arc */
+.timer-status {
+  font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--muted); height: 18px; line-height: 18px; transition: color .2s;
+  margin-bottom: 6px;
 }
 
-/* ━━━━━━ SCREENS ━━━━━━ */
-.screen {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  bottom: var(--ad);
-  display: flex; flex-direction: column;
+/* The big circular arc timer */
+.timer-arc-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 20px; width: 100%;
+}
+#timer-cvs { display: block; flex-shrink: 0; }
+
+/* Side: urgency message + strip bar */
+.timer-side {
+  flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px;
+}
+.timer-msg {
+  font-size: 13px; font-weight: 700; color: var(--muted); transition: color .2s;
+  min-height: 20px;
+}
+/* Full-width depleting strip */
+.timer-strip-bg {
+  height: 6px; background: #F0EFEC; border-radius: 3px; overflow: visible; position: relative;
+}
+.timer-strip-fill {
+  height: 100%; border-radius: 3px;
+  background: var(--green); width: 100%;
+  transform-origin: left center;
+  transition: background .3s;
+}
+/* Glow on strip fill */
+.timer-strip-fill.urgent { background: var(--orange); }
+.timer-strip-fill.critical { background: var(--red); }
+
+.timer-hint {
+  font-size: 11px; color: var(--muted); text-align: left;
+}
+
+/* ── CANVAS ZONE ── */
+.canvas-zone {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  position: relative; padding: 10px 10px 6px;
+}
+#canvas-wrap {
+  position: relative; border-radius: 16px; overflow: hidden;
+  transition: box-shadow .1s;
+}
+#main-canvas {
+  touch-action: none; cursor: crosshair; display: block;
+  background: var(--bg); border-radius: 16px;
+}
+.draw-hint {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  font-size: 13px; color: var(--muted); white-space: nowrap;
+  pointer-events: none; transition: opacity .2s;
+}
+
+/* Canvas shake animation */
+@keyframes shake-hard {
+  0%,100% { transform: translateX(0); }
+  10%      { transform: translateX(-4px) rotate(-.3deg); }
+  20%      { transform: translateX( 5px) rotate( .3deg); }
+  30%      { transform: translateX(-5px) rotate(-.2deg); }
+  40%      { transform: translateX( 4px) rotate( .2deg); }
+  50%      { transform: translateX(-4px); }
+  60%      { transform: translateX( 3px); }
+  70%      { transform: translateX(-3px); }
+  80%      { transform: translateX( 2px); }
+  90%      { transform: translateX(-2px); }
+}
+@keyframes shake-soft {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-2px); }
+  75%      { transform: translateX( 2px); }
+}
+.shake-soft { animation: shake-soft .15s ease-in-out infinite; }
+.shake-hard { animation: shake-hard .12s ease-in-out infinite; }
+
+/* ── GAME FOOTER ── */
+.game-footer { padding: 6px 20px 24px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+.tries-row   { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 18px; }
+.try-dot     { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.try-dot.empty { opacity: .15; }
+.tries-zero  { font-size: 13px; color: var(--muted); }
+.btn-ad {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--text);
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background .15s;
+}
+.btn-ad:not(:disabled):hover { background: #eee; }
+.btn-ad:disabled { opacity: .4; cursor: not-allowed; }
+.btn-ad-left { display: flex; align-items: center; gap: 8px; }
+.ad-badge    { background: var(--orange); color: #fff; border-radius: 10px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+
+/* ══ RESULT ══ */
+#screen-result { background: #fff; }
+.result-header  {
+  padding: 18px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.result-header-title { font-size: 16px; font-weight: 700; }
+.result-tries-left   { font-size: 13px; color: var(--muted); }
+.result-body {
+  flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: calc(var(--sat) + 16px) 20px 12px;
-  opacity: 0; pointer-events: none;
-  transform: translateY(28px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  overflow: hidden;
+  padding: 12px 24px 0;
 }
-.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
-
-/* ━━━━━━ AD ZONE ━━━━━━ */
-#ad-zone {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: calc(var(--ad) + var(--sab));
-  background: #0a0a1e;
-  border-top: 1.5px solid rgba(232,0,61,0.25);
-  display: flex;
-  flex-direction: column;
-  align-items: center; justify-content: center;
-  padding-bottom: var(--sab);
-  z-index: 10;
+.score-ring-wrap  { position: relative; width: 190px; height: 190px; margin-bottom: 16px; flex-shrink: 0; }
+#ring-canvas      { position: absolute; inset: 0; }
+.score-inner      { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-number     { font-size: 54px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
+.score-unit       { font-size: 16px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+.new-record-badge {
+  display: none; align-items: center; gap: 6px;
+  background: linear-gradient(135deg,#FF6B35,var(--red));
+  color: #fff; border-radius: 20px; padding: 8px 20px;
+  font-size: 13px; font-weight: 700; margin-bottom: 8px;
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
 }
-#ad-label {
-  font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
-  color: rgba(255,255,255,0.25); text-transform: uppercase;
-  margin-bottom: 3px;
-}
-#ad-content {
-  font-size: 13px; font-weight: 500;
-  color: rgba(255,255,255,0.28);
-  letter-spacing: 0.3px;
-}
-
-/* ━━━━━━ TYPOGRAPHY ━━━━━━ */
-.t-title  { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
-.t-score  { font-size: 48px; font-weight: 800; letter-spacing: -1px; }
-.t-body   { font-size: 16px; font-weight: 400; line-height: 1.6; }
-
-/* ━━━━━━ BUTTONS ━━━━━━ */
-.btn {
-  width: 100%; max-width: 360px; height: 56px;
-  border-radius: var(--r); border: none;
-  font-family: inherit; font-size: 17px; font-weight: 700;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-  -webkit-appearance: none; position: relative; overflow: hidden;
-}
-.btn:active { transform: scale(0.97); filter: brightness(0.88); }
-.btn:disabled { opacity: 0.45; pointer-events: none; }
-
-.btn-p {
-  background: var(--pg);
-  color: #fff;
-  box-shadow: 0 6px 28px rgba(232,0,61,0.38);
-}
-.btn-p::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.btn-s {
-  background: var(--s2);
-  color: var(--txt);
-  border: 1px solid var(--b2);
-}
-
-.btn-g {
-  background: transparent; color: rgba(255,255,255,0.65);
-  font-size: 15px; font-weight: 500; height: 44px;
-}
-
-/* pulse animation for primary CTA */
-@keyframes ctaPulse {
-  0%, 100% { box-shadow: 0 6px 28px rgba(232,0,61,0.38); }
-  50%       { box-shadow: 0 6px 40px rgba(232,0,61,0.65), 0 0 0 10px rgba(232,0,61,0.12); }
-}
-.btn-pulse { animation: ctaPulse 2.2s ease-in-out infinite; }
-
-/* ━━━━━━ DOTS ━━━━━━ */
-.dots { display: flex; gap: 7px; align-items: center; justify-content: center; }
-.dot  { width: 9px; height: 9px; border-radius: 50%; background: var(--p); transition: opacity 0.25s; }
-.dot.off { opacity: 0.18; }
-
-/* ━━━━━━ CANVAS AREA ━━━━━━ */
-#canvas-outer {
-  position: relative;
-  width: min(270px, calc(100vw - 90px));
-  aspect-ratio: 1;
-}
-
-#canvas-ring {
-  position: absolute;
-  inset: -5px; border-radius: 50%;
-  border: 2.5px solid rgba(232,0,61,0.22);
-  animation: ringBreath 3s ease-in-out infinite;
-  pointer-events: none;
-}
-#canvas-ring::before {
-  content: ''; position: absolute; inset: -8px; border-radius: 50%;
-  border: 1px solid rgba(232,0,61,0.08);
-}
-
-@keyframes ringBreath {
-  0%, 100% { box-shadow: 0 0 20px rgba(232,0,61,0.10); border-color: rgba(232,0,61,0.22); }
-  50%       { box-shadow: 0 0 50px rgba(232,0,61,0.28); border-color: rgba(232,0,61,0.45); }
-}
-
-#game-canvas {
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(232,0,61,0.04) 0%, rgba(0,0,0,0.0) 70%);
-  display: block;
-  touch-action: none;
-}
-
-/* ━━━━━━ COUNTDOWN ━━━━━━ */
-#cd-num {
-  font-size: 100px; font-weight: 900;
-  letter-spacing: -4px; line-height: 1;
-  display: inline-block; color: var(--p);
-}
-
-/* ━━━━━━ OVERLAYS / MODALS ━━━━━━ */
-.ov {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.78); backdrop-filter: blur(4px);
-  display: none; align-items: flex-end; justify-content: center;
-  z-index: 50; padding-bottom: calc(var(--ad) + var(--sab));
-}
-.ov.open { display: flex; }
-
-.sheet {
-  background: var(--s1);
-  border: 1px solid var(--b2);
-  border-radius: 26px 26px 0 0;
-  padding: 8px 20px 28px;
-  width: 100%; max-width: 430px;
-  animation: sheetUp 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
-}
-.sheet-handle {
-  width: 40px; height: 4px; background: var(--b2);
-  border-radius: 2px; margin: 0 auto 20px;
-}
-
-@keyframes sheetUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
-/* ━━━━━━ INPUT ━━━━━━ */
-input.field {
-  width: 100%; background: rgba(255,255,255,0.055);
-  border: 1.5px solid var(--b1); border-radius: 13px;
-  padding: 15px 16px; font-family: inherit;
-  font-size: 16px; color: var(--txt); outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  -webkit-appearance: none;
-}
-input.field:focus { border-color: var(--p); background: rgba(232,0,61,0.06); }
-input.field::placeholder { color: var(--mut); }
-
-/* ━━━━━━ PROGRESS BAR ━━━━━━ */
-.prog { height: 5px; background: var(--b1); border-radius: 3px; overflow: hidden; }
-.prog-fill { height: 100%; background: var(--pg); border-radius: 3px; transition: width 1s linear; }
-
-/* ━━━━━━ CONFETTI ━━━━━━ */
-#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 200; overflow: hidden; }
-.cf { position: absolute; border-radius: 2px; }
-
-/* ━━━━━━ ANIMATIONS ━━━━━━ */
+.new-record-badge.show { display: flex; }
 @keyframes popIn {
-  0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
-  65%  { transform: scale(1.12) rotate(2deg); }
-  100% { transform: scale(1)   rotate(0deg); opacity: 1; }
+  from { transform:scale(.4) translateY(10px); opacity:0; }
+  to   { transform:scale(1)  translateY(0);    opacity:1; }
 }
-.pop { animation: popIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.unlock-hint {
+  display: none; align-items: center; gap: 6px;
+  background: #EEF3FF; border: 1px solid #B8CCFF; border-radius: 12px;
+  padding: 7px 14px; font-size: 12px; color: #2251CC; font-weight: 600; margin-bottom: 8px;
+}
+.unlock-hint.show { display: flex; }
+.grade-label { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.grade-desc  { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.rank-row    { font-size: 14px; color: var(--muted); }
+.rank-high   { color: var(--red); font-weight: 800; font-size: 17px; }
+.result-footer { padding: 10px 20px 28px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+.btn-retry {
+  background: var(--red); color: #fff; border: none; border-radius: 14px;
+  padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer;
+  font-family: inherit; width: 100%; transition: opacity .15s, transform .12s;
+}
+.btn-retry:not(:disabled):active { transform: scale(.97); opacity: .9; }
+.btn-retry:disabled { opacity: .35; cursor: not-allowed; }
 
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ══ AD ══ */
+#screen-ad { background: #000; align-items: stretch; justify-content: flex-start; }
+.ad-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,.05); }
+.ad-topbar-label { font-size: 11px; color: rgba(255,255,255,.35); }
+.ad-skip-btn {
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px; padding: 5px 14px; font-size: 12px; color: rgba(255,255,255,.65);
+  cursor: pointer; font-family: inherit; display: none;
 }
-.fade-up { animation: fadeSlideUp 0.35s ease both; }
+.ad-skip-btn.show { display: block; }
+.ad-content {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 24px; gap: 20px;
+}
+.ad-brand-logo {
+  width: 68px; height: 68px; border-radius: 18px;
+  background: linear-gradient(135deg,#4285F4,#34A853);
+  display: flex; align-items: center; justify-content: center; font-size: 30px;
+}
+.ad-headline { font-size: 22px; font-weight: 700; color: #fff; text-align: center; line-height: 1.35; }
+.ad-body     { font-size: 14px; color: rgba(255,255,255,.55); text-align: center; line-height: 1.65; max-width: 280px; }
+.ad-cta      { background: #4285F4; color: #fff; border: none; border-radius: 12px; padding: 14px 36px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.ad-bottombar { padding: 12px 16px 28px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ad-timer-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ad-timer-lbl { font-size: 12px; color: rgba(255,255,255,.4); min-width: 58px; }
+.ad-bar-bg    { flex: 1; height: 3px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; }
+.ad-bar-fill  { height: 100%; background: #4285F4; border-radius: 2px; width: 0%; transition: width .8s linear; }
+.ad-reward-note { font-size: 12px; color: rgba(255,255,255,.4); }
+.ad-reward-note strong { color: var(--orange); }
+.ad-google-tag  { font-size: 10px; color: rgba(255,255,255,.18); }
 
-@keyframes scoreReveal {
-  0%   { transform: scale(0.6) translateY(20px); opacity: 0; filter: blur(8px); }
-  100% { transform: scale(1)   translateY(0);    opacity: 1; filter: blur(0); }
+/* ══ REWARD TOAST ══ */
+#reward-toast {
+  position: absolute; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.72);
+  display: none; align-items: center; justify-content: center;
 }
-.score-reveal { animation: scoreReveal 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+#reward-toast.show { display: flex; }
+.reward-card {
+  background: #fff; border-radius: 24px; padding: 40px 36px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1); width: 280px;
+}
+.reward-icon   { font-size: 56px; }
+.reward-title  { font-size: 22px; font-weight: 800; }
+.reward-amount { background: linear-gradient(135deg,var(--orange),var(--red)); color: #fff; border-radius: 20px; padding: 10px 28px; font-size: 17px; font-weight: 800; }
+.reward-sub    { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
 
-/* SVG check draw */
-@keyframes drawCheck {
-  from { stroke-dashoffset: 100; }
-  to   { stroke-dashoffset: 0; }
+/* ══ TIME'S UP FLASH ══ */
+#timesup-flash {
+  position: absolute; inset: 0; z-index: 150; pointer-events: none;
+  background: rgba(232,0,28,0); display: flex; align-items: center; justify-content: center;
+  transition: background .1s;
 }
-.check-draw { animation: drawCheck 0.6s ease 0.2s both; }
+#timesup-flash.show { background: rgba(232,0,28,.25); }
+.timesup-text {
+  font-size: 48px; font-weight: 900; color: #fff; letter-spacing: -1px;
+  text-shadow: 0 2px 20px rgba(0,0,0,.5);
+  opacity: 0; transform: scale(.6);
+  transition: opacity .15s, transform .15s;
+}
+#timesup-flash.show .timesup-text { opacity: 1; transform: scale(1); }
 
-/* Glow badge */
-.badge-glow {
-  background: linear-gradient(135deg, var(--p), #FF6B6B);
-  border-radius: 100px; padding: 7px 18px;
-  font-size: 13px; font-weight: 700; display: inline-block;
-  box-shadow: 0 4px 20px rgba(232,0,61,0.4);
-  animation: badgeBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+/* ══ LEVEL UP ══ */
+#screen-levelup {
+  background: linear-gradient(150deg,#0D1B40 0%,#152B6E 100%);
+  align-items: center; justify-content: center; gap: 20px; padding: 40px;
 }
-@keyframes badgeBounce {
-  from { transform: scale(0.5); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
+.lu-trophy { font-size: 60px; animation: bounce .8s ease-in-out; }
+@keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
+.lu-title  { font-size: 26px; font-weight: 800; color: #fff; text-align: center; line-height: 1.3; }
+.lu-sub    { font-size: 14px; color: rgba(255,255,255,.55); text-align: center; line-height: 1.7; }
+.lu-shape  {
+  width: 100px; height: 100px; background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.18); border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 50px; font-weight: 900; color: rgba(255,255,255,.9);
+  animation: glow 1.5s ease-in-out infinite alternate;
 }
+@keyframes glow { from { box-shadow:0 0 0 rgba(255,255,255,0); } to { box-shadow:0 0 24px rgba(255,255,255,.18); } }
+.lu-note { font-size: 11px; color: rgba(255,255,255,.25); text-align: center; }
 
-/* Divider */
-.div { height: 1px; background: var(--b1); margin: 4px 0; width: 100%; max-width: 360px; }
+/* ══ EFFECTS ══ */
+.confetti-piece {
+  position: absolute; width: 8px; height: 8px; border-radius: 2px;
+  pointer-events: none; animation: cfall var(--dur,1.5s) ease-in forwards;
+}
+@keyframes cfall { 0% { transform:translate(0,-20px) rotate(0deg); opacity:1; } 100% { transform:translate(var(--tx),100px) rotate(var(--rot)); opacity:0; } }
+.coin-burst {
+  position: absolute; font-size: 20px; pointer-events: none;
+  animation: cfly .8s ease-out forwards;
+}
+@keyframes cfly { 0% { transform:translate(0,0) scale(1); opacity:1; } 100% { transform:translate(var(--tx,0px),var(--ty,-60px)) scale(.5); opacity:0; } }
+
+/* Screen flash vignette */
+@keyframes redVignette {
+  0%,100% { box-shadow: inset 0 0 0 rgba(232,0,28,0); }
+  50%      { box-shadow: inset 0 0 60px rgba(232,0,28,.35); }
+}
+.vignette-pulse { animation: redVignette var(--vdur,.4s) ease-in-out infinite; }
 </style>
 </head>
 <body>
+<div id="app">
 
-<!-- ══════════════ INTRO ══════════════ -->
-<div id="s-intro" class="screen active">
-  <!-- Logo hero -->
-  <div style="text-align:center; margin-bottom:26px;">
-    <div style="position:relative; display:inline-block;">
-      <div style="font-size:80px; font-weight:900; letter-spacing:-4px; line-height:1;">
-        <span style="color:var(--p); text-shadow: 0 0 60px rgba(232,0,61,0.5);">S</span><span style="color:rgba(255,255,255,0.18);">K</span>
+  <!-- ═══ WELCOME ═══ -->
+  <div class="screen" id="screen-welcome">
+    <div class="w-logo">SK</div>
+    <div class="w-sub">SK 그리기</div>
+    <div class="w-desc">2초 안에 S를 완벽하게 그려보세요<br>기록을 깰 때마다 포인트 적립!</div>
+    <div class="tries-pill">
+      <span style="font-size:20px">🎮</span>
+      <span>첫 참여 기회 <strong>3회</strong> 무료 제공</span>
+    </div>
+    <button class="btn-primary" onclick="startGame()">시작하기</button>
+  </div>
+
+  <!-- ═══ GAME ═══ -->
+  <div class="screen hidden" id="screen-game">
+
+    <div class="game-header">
+      <div class="level-chip">
+        <div>
+          <div class="level-num">단계 <span id="level-num-txt">1</span></div>
+          <div class="level-char" id="level-char-txt">S</div>
+        </div>
       </div>
-      <div style="position:absolute; inset:0; background:radial-gradient(circle,rgba(232,0,61,0.2),transparent 70%); pointer-events:none; border-radius:50%;"></div>
-    </div>
-    <div class="t-title" style="margin-top:8px;">S자 챌린지</div>
-    <div class="t-body" style="color:var(--mut); margin-top:6px; font-size:15px;">한 번에 완벽한 S를 그려보세요</div>
-  </div>
-
-  <!-- Attempts indicator -->
-  <div style="text-align:center; margin-bottom:30px;">
-    <div style="font-size:12px; font-weight:600; color:var(--mut); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px;">오늘 남은 기회</div>
-    <div class="dots" id="intro-dots"></div>
-    <div id="intro-empty" style="display:none; font-size:14px; color:var(--mut); margin-top:10px;">내일 새벽 3회 충전돼요 ☀️</div>
-  </div>
-
-  <!-- Event Banner -->
-  <div style="width:100%; max-width:360px; background:linear-gradient(135deg,rgba(232,0,61,0.18),rgba(232,0,61,0.06)); border:1px solid rgba(232,0,61,0.35); border-radius:16px; padding:14px 16px; margin-bottom:18px; position:relative; overflow:hidden;">
-    <div style="position:absolute;top:-18px;right:-10px;font-size:60px;opacity:0.07;line-height:1;">🎯</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-      <span style="background:var(--p);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:100px;">CHALLENGE</span>
-    </div>
-    <div style="font-size:15px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:5px;">내 최고 스코어에 도전하세요!</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.8;">
-      손가락을 떼지 않고 <strong style="color:rgba(255,255,255,0.85);">완벽한 S</strong>를 그려보세요
-    </div>
-  </div>
-
-  <!-- CTAs -->
-  <div style="width:100%; max-width:360px; display:flex; flex-direction:column; gap:10px;">
-    <button class="btn btn-p btn-pulse" id="btn-start">🎯 도전 시작!</button>
-    <button class="btn btn-p btn-pulse" id="btn-ad-intro" style="display:none;">📺 광고 보고 +2회 획득</button>
-  </div>
-
-  <!-- Tip -->
-  <div style="margin-top:20px; font-size:13px; color:rgba(255,255,255,0.28); text-align:center; font-weight:500;">
-    손가락을 떼지 않고 S를 단번에!
-  </div>
-</div>
-
-<!-- ══════════════ COUNTDOWN ══════════════ -->
-<div id="s-countdown" class="screen">
-  <div style="text-align:center;">
-    <div style="font-size:15px; font-weight:600; color:var(--mut); margin-bottom:10px; line-height:1.7;">
-      SK의 <span style="color:var(--p); font-weight:800;">S</span>를<br>한 획에 따라 그려보세요!
-    </div>
-    <div style="font-size:12px; color:rgba(255,255,255,0.3); margin-bottom:28px;">● 시작점 → 끝점까지 손가락 떼지 말기</div>
-    <div id="cd-num">3</div>
-  </div>
-</div>
-
-<!-- ══════════════ GAME ══════════════ -->
-<div id="s-game" class="screen">
-  <div style="text-align:center; margin-bottom:14px;">
-    <div style="font-size:11px; font-weight:700; color:var(--mut); letter-spacing:2.5px; text-transform:uppercase; margin-bottom:10px;">DRAW THE S</div>
-    <!-- 최고 기록 + 응원 멘트 -->
-    <div id="game-best-wrap" style="display:inline-flex; flex-direction:column; align-items:center; gap:4px;">
-      <div style="display:flex; align-items:center; gap:7px;">
-        <span style="font-size:11px; color:rgba(255,255,255,0.35); font-weight:600; letter-spacing:1px;">내 최고 기록</span>
-        <span id="game-best-score" style="font-size:16px; font-weight:900; color:var(--p);">--</span>
+      <div class="hdr-stats">
+        <div class="hdr-stat">
+          <div class="hdr-val" id="hdr-best">—</div>
+          <div class="hdr-lbl">최고기록</div>
+        </div>
+        <div class="hdr-stat">
+          <div class="hdr-val" id="hdr-tries" style="color:var(--red)">3</div>
+          <div class="hdr-lbl">참여기회</div>
+        </div>
       </div>
-      <div id="game-best-msg" style="font-size:12px; color:rgba(255,255,255,0.40); font-weight:500;"></div>
-    </div>
-  </div>
-
-  <div id="canvas-outer">
-    <div id="canvas-ring"></div>
-    <canvas id="game-canvas"></canvas>
-  </div>
-
-  <div style="margin-top:20px; text-align:center; min-height:36px;">
-    <div id="game-hint" class="t-body" style="color:var(--mut); font-size:15px; font-weight:500;">
-      ● 에서 시작해 S를 그리세요
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ RESULT ══════════════ -->
-<div id="s-result" class="screen">
-  <!-- Score -->
-  <div style="text-align:center; margin-bottom:14px;">
-    <div style="font-size:12px; font-weight:600; color:var(--mut); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px;">내 정확도</div>
-    <div id="r-score" class="t-score" style="color:var(--p);">00.00%</div>
-    <div id="r-msg"   class="t-body"  style="color:var(--mut); margin-top:5px; font-size:14px;"></div>
-  </div>
-
-  <!-- SVG result icon + share preview side by side -->
-  <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
-    <!-- SVG icon -->
-    <div id="r-icon" style="flex-shrink:0;">
-      <svg id="r-svg" width="64" height="64" viewBox="0 0 64 64">
-        <circle cx="32" cy="32" r="28" fill="none" stroke="var(--b2)" stroke-width="2"/>
-        <circle id="r-ring" cx="32" cy="32" r="28" fill="none" stroke="var(--p)" stroke-width="2.5"
-          stroke-dasharray="176" stroke-dashoffset="176" stroke-linecap="round"
-          transform="rotate(-90 32 32)" style="transition: stroke-dashoffset 0.8s ease;"/>
-        <path id="r-check" d="M 16,32 L 27,44 L 48,20" fill="none" stroke="#00D084" stroke-width="4"
-          stroke-linecap="round" stroke-linejoin="round"
-          stroke-dasharray="50" stroke-dashoffset="50"/>
-        <path id="r-cross" d="M 20,20 L 44,44 M 44,20 L 20,44" fill="none" stroke="#FF6B6B" stroke-width="3.5"
-          stroke-linecap="round" stroke-dasharray="34" stroke-dashoffset="34" style="display:none;"/>
-      </svg>
     </div>
 
-    <!-- Share canvas -->
-    <canvas id="share-canvas" width="200" height="200"
-      style="border-radius:16px; border:1px solid var(--b2); flex-shrink:0;
-             width:130px; height:130px;"></canvas>
-  </div>
+    <!-- ⏱ TIMER ZONE -->
+    <div class="timer-zone" id="timer-zone">
+      <div class="timer-status" id="timer-status">터치하면 시작</div>
+      <div class="timer-arc-row">
+        <canvas id="timer-cvs" width="100" height="100"></canvas>
+        <div class="timer-side">
+          <div class="timer-msg" id="timer-msg">S를 그리세요</div>
+          <div class="timer-strip-bg">
+            <div class="timer-strip-fill" id="timer-strip"></div>
+          </div>
+          <div class="timer-hint" id="timer-hint">손을 떼면 자동 완성</div>
+        </div>
+      </div>
+    </div>
 
-  <!-- New record -->
-  <div id="r-newrec" style="display:none; margin-bottom:12px; text-align:center;">
-    <span class="badge-glow">🎉 신기록 달성!</span>
-  </div>
 
-  <!-- CTAs -->
-  <div style="width:100%; max-width:360px; display:flex; flex-direction:column; gap:10px;">
-    <!-- PRIMARY — ad watch -->
-    <button class="btn btn-p btn-pulse" id="btn-ad" style="height:60px; flex-direction:column; gap:2px; line-height:1.2;">
-      <span style="font-size:17px; font-weight:800;">📺 광고 보고 +2회 획득</span>
-      <span style="font-size:11px; font-weight:400; opacity:0.75;">5초 광고 시청 후 2번 더 도전!</span>
-    </button>
+    <div class="canvas-zone">
+      <div id="canvas-wrap">
+        <canvas id="main-canvas" width="290" height="290"></canvas>
+        <div class="draw-hint" id="draw-hint">✏️ 여기를 터치해 그리기 시작</div>
+      </div>
+    </div>
 
-    <div style="display:flex; gap:9px;">
-      <button class="btn btn-s" id="btn-retry" style="flex:1; height:52px; font-size:14px;">
-        🔄 다시 도전
+    <div class="game-footer">
+      <div class="tries-row" id="tries-row"></div>
+      <button class="btn-ad" id="btn-ad-game" onclick="requestAd('game')">
+        <div class="btn-ad-left">
+          <span style="font-size:16px">📺</span>
+          <span id="ad-btn-txt-game">광고 보고</span>
+        </div>
+        <span class="ad-badge">참여 기회 +2</span>
       </button>
     </div>
   </div>
-</div>
 
-<!-- ══════════════ LEADERBOARD ══════════════ -->
-<!-- ══════════════ AD ZONE ══════════════ -->
-<div id="ad-zone">
-  <span id="ad-label">광고</span>
-  <ins class="adsbygoogle"
-       style="display:inline-block;width:320px;height:72px"
-       data-ad-client="ca-pub-1117559813052559"
-       data-ad-slot="3897909216"></ins>
-</div>
-
-<!-- ══════════════ MODAL: AD ══════════════ -->
-<div class="ov" id="ov-ad">
-  <div class="sheet" style="text-align:center;">
-    <div class="sheet-handle"></div>
-    <div class="t-title" style="font-size:22px; margin-bottom:6px;">광고 시청 중</div>
-    <div class="t-body" style="color:var(--mut); font-size:14px; margin-bottom:28px;">끝까지 보면 2번 더 도전할 수 있어요!</div>
-    <div id="ad-num" style="font-size:60px; font-weight:900; color:var(--p); letter-spacing:-2px; margin-bottom:12px; line-height:1;">5</div>
-    <div class="prog" style="margin-bottom:24px; max-width:300px; margin-left:auto; margin-right:auto;">
-      <div class="prog-fill" id="ad-prog" style="width:0%;"></div>
+  <!-- ═══ RESULT ═══ -->
+  <div class="screen hidden" id="screen-result">
+    <div class="result-header">
+      <div class="result-header-title">결과</div>
+      <div class="result-tries-left" id="result-tries-txt">남은 기회 —회</div>
     </div>
-    <button class="btn btn-p" id="btn-ad-done" style="margin-bottom:8px;" disabled>시청 완료 후 활성화돼요</button>
-    <button class="btn btn-g" id="btn-ad-cancel">취소</button>
+    <div class="result-body">
+      <div class="score-ring-wrap">
+        <canvas id="ring-canvas" width="190" height="190"></canvas>
+        <div class="score-inner">
+          <div class="score-number" id="score-number">0</div>
+          <div class="score-unit">점</div>
+        </div>
+      </div>
+      <div class="new-record-badge" id="record-badge">
+        <span>🎉</span><span id="record-badge-txt">최고기록 갱신! +1원 적립</span>
+      </div>
+      <div class="unlock-hint" id="record-gap-hint">
+        <span>🎯</span><span id="record-gap-txt">내 기록 경신까지 —점!</span>
+      </div>
+      <div class="grade-label" id="grade-label">잘했어요</div>
+      <div class="grade-desc"  id="grade-desc">다시 도전해보세요</div>
+      <div class="rank-row">상위 <span class="rank-high" id="rank-pct">—</span>% 기록이에요</div>
+    </div>
+    <div class="result-footer">
+      <button class="btn-retry" id="btn-retry" onclick="retryFromResult()">다시 그리기</button>
+      <button class="btn-ad" id="btn-ad-result" onclick="requestAd('result')">
+        <div class="btn-ad-left">
+          <span style="font-size:16px">📺</span>
+          <span id="ad-btn-txt-result">광고 보고</span>
+        </div>
+        <span class="ad-badge">참여 기회 +2</span>
+      </button>
+    </div>
   </div>
-</div>
 
-<!-- ══════════════ MODAL: CELEBRATE ══════════════ -->
-<div class="ov" id="ov-cel">
-  <div class="sheet" style="text-align:center;">
-    <div class="sheet-handle"></div>
-    <div style="font-size:68px; margin-bottom:6px; line-height:1;">🎉</div>
-    <div class="t-title"  style="margin-bottom:6px;">신기록이에요!</div>
-    <div id="cel-score" class="t-score" style="color:var(--p); margin-bottom:4px;"></div>
-    <div class="t-body"  style="color:var(--mut); font-size:14px; margin-bottom:24px;">역대 최고 정확도를 달성했어요!</div>
-    <button class="btn btn-p" id="btn-cel-ok">확인</button>
+  <!-- ═══ AD ═══ -->
+  <div class="screen hidden" id="screen-ad">
+    <div class="ad-topbar">
+      <div class="ad-topbar-label">광고 · Google Ads</div>
+      <button class="ad-skip-btn" id="ad-skip-btn" onclick="skipAd()">건너뛰기 ›</button>
+    </div>
+    <div class="ad-content">
+      <div class="ad-brand-logo">🛍️</div>
+      <div class="ad-headline">지금 바로 혜택을<br>확인해보세요</div>
+      <div class="ad-body">OCB와 함께하는 특별한 파트너 혜택.<br>포인트 적립부터 할인까지 한 곳에서.</div>
+      <button class="ad-cta" onclick="handleAdClick()">혜택 보러 가기</button>
+    </div>
+    <div class="ad-bottombar">
+      <div class="ad-timer-row">
+        <div class="ad-timer-lbl" id="ad-timer-lbl">30초 남음</div>
+        <div class="ad-bar-bg"><div class="ad-bar-fill" id="ad-bar"></div></div>
+      </div>
+      <div class="ad-reward-note">시청 완료 시 <strong>참여 기회 +2</strong> 자동 지급</div>
+      <div class="ad-google-tag">RewardedInterstitialAd · ca-app-pub-XXXXXXXX</div>
+    </div>
   </div>
-</div>
 
-<!-- Confetti layer -->
-<div id="confetti"></div>
+  <!-- ═══ REWARD TOAST ═══ -->
+  <div id="reward-toast">
+    <div class="reward-card">
+      <div class="reward-icon">🪙</div>
+      <div class="reward-title">1P 지급완료!</div>
+      <div class="reward-amount">참여 기회 +2 🎁</div>
+      <div class="reward-sub">광고 시청이 완료되었어요.<br>잠시 후 게임으로 돌아갑니다.</div>
+    </div>
+  </div>
+
+  <!-- ═══ TIME'S UP FLASH ═══ -->
+  <div id="timesup-flash">
+    <div class="timesup-text">시간 초과!</div>
+  </div>
+
+  <!-- ═══ LEVEL UP ═══ -->
+  <div class="screen hidden" id="screen-levelup">
+    <div class="lu-trophy">🏆</div>
+    <div class="lu-title">97점 달성!<br>다음 단계 오픈 🎉</div>
+    <div class="lu-sub">이번엔 <strong style="color:#fff">K</strong>를 그려보세요</div>
+    <div class="lu-shape">K</div>
+    <button class="btn-primary" onclick="goNextLevel()">K 그리기 도전</button>
+    <div class="lu-note">97점 달성 시 단계별 순차 오픈</div>
+  </div>
+
+</div><!-- /#app -->
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// GLOBAL STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const G = {
-  currentScore:  0,
-  isDrawing:     false,
-  drawn:         [],
-  template:      [],
-  size:          270,
-  adTimer:       null,
-  audioCtx:      null,
-  bgmActive:     false,
-  bgmTimer:      null,
-  cvs:           null,
-  cx:            null,
+/* ══════════════════════════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════════════════════════ */
+const GS = {
+  level: 1, attempts: 3,
+  personalBest: { 1: null, 2: null },
+  adsToday: 0, lastAdMs: null,
+  AD_COOLDOWN_MS: 60 * 60 * 1000,
+  MAX_ADS_DAY: 4, AD_DURATION_S: 30,
+  LEVEL_UP_SCORE: 97,
+  DRAW_TIME: 2.0,         // ★ 제한 시간 (초)
+  drawing: false, pts: [], done: false, lastScore: 0,
+  totalTrials: 0, adCalledFrom: 'game', pendingLevelUp: false,
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DAILY ATTEMPTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function todayStr()  { return new Date().toDateString(); }
-function loadTries() {
-  try {
-    const d = JSON.parse(localStorage.getItem('sk_tries') || '{}');
-    if (d.date !== todayStr()) return freshTries();
-    return d;
-  } catch { return freshTries(); }
-}
-function freshTries() {
-  const d = { date: todayStr(), base: 3, extra: 0 };
-  saveTries(d); return d;
-}
-function saveTries(d) { localStorage.setItem('sk_tries', JSON.stringify(d)); }
-function remaining()  { const d = loadTries(); return d.base + (d.extra || 0); }
-function consume()    {
-  const d = loadTries();
-  if ((d.extra || 0) > 0) d.extra--; else d.base = Math.max(0, d.base - 1);
-  saveTries(d);
-}
-function addExtra(n)  {
-  const d = loadTries(); d.extra = (d.extra || 0) + n; saveTries(d);
-}
+/* Timer state */
+let timerRaf    = null;
+let timerStart  = null;   // performance.now() when countdown began
+let timerState  = 'idle'; // 'idle' | 'running' | 'done'
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SCORES / LEADERBOARD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getScores()  { try { return JSON.parse(localStorage.getItem('sk_scores') || '[]'); } catch { return []; } }
-function topScore()   { const s = getScores(); return s.length ? s[0].score : 0; }
-function addScore(score) {
-  const s = getScores();
-  s.push({ score, date: new Date().toLocaleDateString('ko-KR') });
-  s.sort((a, b) => b.score - a.score);
-  s.splice(10);
-  localStorage.setItem('sk_scores', JSON.stringify(s));
-}
+/* ══════════════════════════════════════════════════════════════
+   REFERENCE PATH
+══════════════════════════════════════════════════════════════ */
+let REF = { 1: [], 2: [] };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SCREEN MANAGER
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function go(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById('s-' + id);
-  if (el) el.classList.add('active');
-}
-function openOv(id)  { document.getElementById('ov-' + id).classList.add('open'); }
-function closeOv(id) { document.getElementById('ov-' + id).classList.remove('open'); }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// AUDIO — Web Audio API
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function initAudio() {
-  if (G.audioCtx) return;
-  G.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-
-function tone(freq, type, start, dur, vol = 0.07) {
-  if (!G.audioCtx) return;
-  const ac = G.audioCtx;
-  const osc = ac.createOscillator();
-  const gain = ac.createGain();
-  osc.connect(gain); gain.connect(ac.destination);
-  osc.type = type; osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0, start);
-  gain.gain.linearRampToValueAtTime(vol, start + 0.015);
-  gain.gain.linearRampToValueAtTime(0, start + dur);
-  osc.start(start); osc.stop(start + dur + 0.02);
-}
-
-function sfx(type) {
-  if (!G.audioCtx) return;
-  const t = G.audioCtx.currentTime;
-  if      (type === 'tick')    { tone(700, 'sine', t, 0.08, 0.055); }
-  else if (type === 'go')      { tone(880,'sine',t,0.10,0.09); tone(1100,'sine',t+0.1,0.12,0.07); }
-  else if (type === 'success') { [523,659,784,1047].forEach((f,i)=>tone(f,'sine',t+i*0.09,0.18,0.07)); }
-  else if (type === 'great')   { [659,784,988,1319].forEach((f,i)=>tone(f,'triangle',t+i*0.07,0.22,0.08)); }
-  else if (type === 'fail')    { tone(250,'sawtooth',t,0.25,0.055); tone(200,'sawtooth',t+0.15,0.28,0.04); }
-}
-
-function startBGM() {
-  if (!G.audioCtx || G.bgmActive) return;
-  G.bgmActive = true;
-  const scale = [261, 294, 330, 392, 440, 523, 587];
-  let i = 0;
-  function beat() {
-    if (!G.bgmActive) return;
-    const t = G.audioCtx.currentTime;
-    tone(scale[i % scale.length], 'sine', t, 0.22, 0.025);
-    i++;
-    G.bgmTimer = setTimeout(beat, 270);
-  }
-  beat();
-}
-function stopBGM() { G.bgmActive = false; clearTimeout(G.bgmTimer); }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// S TEMPLATE GENERATION
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function buildTemplate(size) {
+function sampleSvgPath(d, n) {
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('width','100'); svg.setAttribute('height','100');
-  svg.style.cssText = 'position:absolute;width:0;height:0;visibility:hidden;overflow:visible;';
-  const path = document.createElementNS(ns, 'path');
-  // S in 100×100 units — all key points stay inside a circle of radius ~50 centered at (50,50)
-  // Proper S-shape: start upper-right → upper bowl (arc over top-left) →
-  // diagonal crossover (lower-left to upper-right) → lower bowl (arc under bottom-right) → end lower-left
-  path.setAttribute('d', 'M 68,20 C 68,5 28,5 28,28 C 28,46 72,54 72,72 C 72,95 32,95 32,80');
-  svg.appendChild(path);
+  svg.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:290px;height:290px;visibility:hidden';
   document.body.appendChild(svg);
+  const segs = d.split(/(?=M )/g).filter(Boolean);
+  const allPts = []; let totalLen = 0;
+  const paths = segs.map(seg => {
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', seg); svg.appendChild(p);
+    totalLen += p.getTotalLength(); return p;
+  });
+  const step = totalLen / n; let rem = step / 2;
+  paths.forEach(p => {
+    const len = p.getTotalLength();
+    let pos = rem > len ? (rem -= len, -1) : rem;
+    while (pos >= 0 && pos <= len) {
+      const pt = p.getPointAtLength(pos);
+      allPts.push([pt.x, pt.y]); pos += step;
+    }
+    rem = pos > len ? pos - len : 0;
+  });
+  document.body.removeChild(svg); return allPts;
+}
 
-  const len = path.getTotalLength();
-  const N   = 300;
-  const pts = [];
-  for (let i = 0; i <= N; i++) {
-    const p = path.getPointAtLength((i / N) * len);
-    pts.push({ x: (p.x / 100) * size, y: (p.y / 100) * size, t: i / N });
+function initRef() {
+  // S path scaled for 290×290 canvas
+  const S = 'M 194,76 C 208,48 88,46 88,130 C 88,165 208,164 208,200 C 208,248 90,246 104,220';
+  REF[1] = sampleSvgPath(S, 120);
+  REF[2] = sampleSvgPath('M 110,68 L 110,222', 50)
+    .concat(sampleSvgPath('M 110,145 L 200,68', 28))
+    .concat(sampleSvgPath('M 110,145 L 200,222', 28));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CANVAS
+══════════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('main-canvas');
+const ctx    = canvas.getContext('2d');
+
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return [src.clientX - r.left, src.clientY - r.top];
+}
+
+function redraw() {
+  ctx.clearRect(0, 0, 290, 290);
+  drawGuide();
+  drawUserPath();
+}
+
+function drawGuide() {
+  ctx.save();
+  ctx.globalAlpha = 0.10;
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 4;
+  ctx.setLineDash([8, 8]); ctx.lineCap = ctx.lineJoin = 'round';
+  if (GS.level === 1) {
+    ctx.beginPath();
+    ctx.moveTo(194, 76);
+    ctx.bezierCurveTo(208, 48,  88,  46,  88, 130);
+    ctx.bezierCurveTo( 88, 165, 208, 164, 208, 200);
+    ctx.bezierCurveTo(208, 248,  90, 246, 104, 220);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(110, 68);  ctx.lineTo(110, 222);
+    ctx.moveTo(110, 145); ctx.lineTo(200,  68);
+    ctx.moveTo(110, 145); ctx.lineTo(200, 222);
+    ctx.stroke();
   }
-  document.body.removeChild(svg);
-  return pts;
+  ctx.restore();
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// CANVAS SETUP & DRAW TEMPLATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function setupCanvas() {
-  const outer = document.getElementById('canvas-outer');
-  const size  = outer.offsetWidth;
-  G.size = size;
-  G.cvs  = document.getElementById('game-canvas');
-  G.cvs.width  = size;
-  G.cvs.height = size;
-  G.cx = G.cvs.getContext('2d');
-  G.template = buildTemplate(size);
-  renderTemplate();
+function scoreColor(s) {
+  if (s >= 97) return '#14C25A';
+  if (s >= 85) return '#3B82F6';
+  if (s >= 70) return '#F59E0B';
+  return '#E8001C';
 }
 
-function renderTemplate() {
-  const { cx, size, template: pts } = G;
-  cx.clearRect(0, 0, size, size);
-
-  // Wide glow guide
-  cx.beginPath();
-  cx.moveTo(pts[0].x, pts[0].y);
-  pts.forEach(p => cx.lineTo(p.x, p.y));
-  cx.strokeStyle = 'rgba(232,0,61,0.13)';
-  cx.lineWidth   = 26; cx.lineCap = 'round'; cx.lineJoin = 'round';
-  cx.stroke();
-
-  // Medium guide
-  cx.beginPath();
-  cx.moveTo(pts[0].x, pts[0].y);
-  pts.forEach(p => cx.lineTo(p.x, p.y));
-  cx.strokeStyle = 'rgba(232,0,61,0.32)';
-  cx.lineWidth   = 10;
-  cx.stroke();
-
-  // Sharp center line
-  cx.beginPath();
-  cx.moveTo(pts[0].x, pts[0].y);
-  pts.forEach(p => cx.lineTo(p.x, p.y));
-  cx.strokeStyle = 'rgba(232,0,61,0.70)';
-  cx.lineWidth   = 2;
-  cx.stroke();
-
-  // Ghost "S" text behind
-  cx.font = `bold ${size * 0.55}px 'Pretendard Variable', sans-serif`;
-  cx.fillStyle   = 'rgba(232,0,61,0.035)';
-  cx.textAlign   = 'center'; cx.textBaseline = 'middle';
-  cx.fillText('S', size / 2, size / 2);
-
-  // Start marker
-  const sp = pts[0];
-  cx.beginPath();
-  cx.arc(sp.x, sp.y, 10, 0, Math.PI * 2);
-  const g = cx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, 10);
-  g.addColorStop(0, '#FF4D6D'); g.addColorStop(1, '#E8003D');
-  cx.fillStyle = g; cx.fill();
-  cx.strokeStyle = 'rgba(255,255,255,0.9)'; cx.lineWidth = 2; cx.stroke();
-
-  cx.font = `bold 10px sans-serif`;
-  cx.fillStyle = 'rgba(255,255,255,0.55)';
-  cx.textAlign = 'center'; cx.textBaseline = 'bottom';
-  cx.fillText('START', sp.x, sp.y - 15);
-
-  // End marker (ghost)
-  const ep = pts[pts.length - 1];
-  cx.beginPath();
-  cx.arc(ep.x, ep.y, 6, 0, Math.PI * 2);
-  cx.fillStyle = 'rgba(232,0,61,0.35)'; cx.fill();
-  cx.fillStyle = 'rgba(255,255,255,0.35)';
-  cx.font = 'bold 9px sans-serif'; cx.textBaseline = 'top';
-  cx.fillText('END', ep.x, ep.y + 10);
+function drawUserPath() {
+  if (!GS.pts.length) return;
+  ctx.save();
+  ctx.setLineDash([]); ctx.lineJoin = ctx.lineCap = 'round';
+  ctx.lineWidth   = GS.done ? 3.5 : 3;
+  ctx.strokeStyle = GS.done ? scoreColor(GS.lastScore) : '#1A1A1A';
+  ctx.beginPath();
+  ctx.moveTo(GS.pts[0][0], GS.pts[0][1]);
+  for (let i = 1; i < GS.pts.length; i++) ctx.lineTo(GS.pts[i][0], GS.pts[i][1]);
+  ctx.stroke();
+  if (!GS.done && GS.pts.length > 1) {
+    const a = 0.4 + 0.3 * Math.sin(Date.now() / 300);
+    ctx.beginPath();
+    ctx.arc(GS.pts[0][0], GS.pts[0][1], 5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(232,0,28,${a})`;
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// DRAWING — events
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function pt(e) {
-  const r = G.cvs.getBoundingClientRect();
-  const s = e.touches ? e.touches[0] : e;
-  const sc = G.cvs.width / r.width;
-  return { x: (s.clientX - r.left) * sc, y: (s.clientY - r.top) * sc };
+/* Drawing RAF loop */
+(function drawLoop() {
+  if (GS.drawing && !GS.done) redraw();
+  requestAnimationFrame(drawLoop);
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   ⏱ TIMER SYSTEM
+══════════════════════════════════════════════════════════════ */
+const timerCvs  = document.getElementById('timer-cvs');
+const timerCtx  = timerCvs.getContext('2d');
+const CX = 50, CY = 50, RADIUS = 38; // timer arc geometry
+
+function startTimer() {
+  timerStart = performance.now();
+  timerState = 'running';
+  timerRaf   = requestAnimationFrame(timerLoop);
+  document.getElementById('draw-hint').style.opacity = '0';
 }
 
-function onDown(e) {
-  e.preventDefault();
-  const p = pt(e);
-  G.isDrawing = true;
-  G.drawn = [p];
-  renderTemplate();
-  G.cx.beginPath();
-  G.cx.moveTo(p.x, p.y);
-  G.cx.strokeStyle = '#E8003D';
-  G.cx.lineWidth   = 7;
-  G.cx.lineCap = 'round'; G.cx.lineJoin = 'round';
-  document.getElementById('game-hint').textContent = '계속 그리세요...';
+function stopTimer() {
+  if (timerRaf) { cancelAnimationFrame(timerRaf); timerRaf = null; }
+  timerState = 'done';
+  // Remove shake classes
+  const wrap = document.getElementById('canvas-wrap');
+  wrap.classList.remove('shake-soft', 'shake-hard', 'vignette-pulse');
+  wrap.style['--vdur'] = '';
 }
 
-function onMove(e) {
-  e.preventDefault();
-  if (!G.isDrawing) return;
-  const p = pt(e);
-  G.drawn.push(p);
-  G.cx.lineTo(p.x, p.y);
-  G.cx.stroke();
-  G.cx.beginPath();
-  G.cx.moveTo(p.x, p.y);
-}
+function timerLoop(now) {
+  if (timerState !== 'running') return;
+  const elapsed   = (now - timerStart) / 1000;
+  const remaining = Math.max(0, GS.DRAW_TIME - elapsed);
+  const progress  = remaining / GS.DRAW_TIME; // 1 → 0
 
-function onUp(e) {
-  e?.preventDefault();
-  if (!G.isDrawing) return;
-  G.isDrawing = false;
+  renderTimerArc(remaining, progress);
+  renderTimerStrip(progress);
+  renderTimerEffects(remaining, progress);
 
-  if (G.drawn.length < 15) {
-    document.getElementById('game-hint').textContent = '너무 짧아요! 다시 시도해보세요';
-    setTimeout(() => {
-      renderTemplate();
-      document.getElementById('game-hint').textContent = '● 에서 시작해 S를 그리세요';
-    }, 1200);
+  if (remaining <= 0) {
+    stopTimer();
+    handleTimeUp();
     return;
   }
-
-  document.getElementById('game-hint').textContent = '정확도 계산 중...';
-  setTimeout(finishDraw, 450);
+  timerRaf = requestAnimationFrame(timerLoop);
 }
 
-function bindCanvas() {
-  const c = G.cvs;
-  c.addEventListener('mousedown',  onDown);
-  c.addEventListener('mousemove',  onMove);
-  c.addEventListener('mouseup',    onUp);
-  c.addEventListener('mouseleave', onUp);
-  c.addEventListener('touchstart', onDown,  { passive: false });
-  c.addEventListener('touchmove',  onMove,  { passive: false });
-  c.addEventListener('touchend',   onUp,    { passive: false });
+/* Arc canvas render */
+function renderTimerArc(remaining, progress) {
+  timerCtx.clearRect(0, 0, 100, 100);
+
+  // Determine color based on remaining time
+  let color, r, g, b;
+  if (remaining > 2.0) {
+    // Green zone
+    r=20; g=194; b=90;
+  } else if (remaining > 1.2) {
+    // Amber transition
+    const t = (2.0 - remaining) / 0.8;
+    r = Math.round(20 + t*(245-20));
+    g = Math.round(194 + t*(158-194));
+    b = Math.round(90  + t*(11-90));
+  } else if (remaining > 0.5) {
+    // Red transition
+    const t = (1.2 - remaining) / 0.7;
+    r = Math.round(245 + t*(232-245));
+    g = Math.round(158 + t*(0-158));
+    b = Math.round(11  + t*(28-11));
+  } else {
+    r=232; g=0; b=28;
+  }
+  color = `rgb(${r},${g},${b})`;
+
+  // Track ring
+  timerCtx.beginPath();
+  timerCtx.arc(CX, CY, RADIUS, 0, Math.PI * 2);
+  timerCtx.strokeStyle = 'rgba(0,0,0,0.07)';
+  timerCtx.lineWidth = 8;
+  timerCtx.stroke();
+
+  // Depleting arc (clockwise from top, remaining portion)
+  if (progress > 0) {
+    timerCtx.beginPath();
+    timerCtx.arc(CX, CY, RADIUS, -Math.PI/2, -Math.PI/2 + progress * Math.PI * 2);
+    timerCtx.strokeStyle = color;
+    timerCtx.lineWidth = 8;
+    timerCtx.lineCap = 'round';
+    timerCtx.stroke();
+
+    // Tip glow dot (shows the moving end of the arc)
+    if (progress < 0.95) {
+      const tipAngle = -Math.PI/2 + progress * Math.PI * 2;
+      const tx = CX + RADIUS * Math.cos(tipAngle);
+      const ty = CY + RADIUS * Math.sin(tipAngle);
+      timerCtx.beginPath();
+      timerCtx.arc(tx, ty, remaining < 1 ? 6 : 4, 0, Math.PI * 2);
+      timerCtx.fillStyle = color;
+      timerCtx.fill();
+    }
+  }
+
+  // Center background disc
+  timerCtx.beginPath();
+  timerCtx.arc(CX, CY, RADIUS - 10, 0, Math.PI * 2);
+  timerCtx.fillStyle = remaining < 0.5
+    ? `rgba(${r},${g},${b},0.08)`
+    : 'rgba(0,0,0,0.03)';
+  timerCtx.fill();
+
+  // Pulse scale for number (faster as time runs out)
+  let pulseFreq = remaining > 2 ? 2 : remaining > 1 ? 5 : 12;
+  let pulseAmp  = remaining > 2 ? 0.02 : remaining > 1 ? 0.05 : 0.12;
+  let numScale  = 1 + pulseAmp * Math.sin(remaining * Math.PI * pulseFreq * 2);
+  // When < 0.5s, override with heavy throb
+  if (remaining < 0.5) {
+    numScale = 1 + 0.18 * Math.abs(Math.sin(remaining * Math.PI * 20));
+  }
+
+  const fontSize = remaining < 1.0 ? 26 : 22;
+  timerCtx.save();
+  timerCtx.translate(CX, CY);
+  timerCtx.scale(numScale, numScale);
+  timerCtx.fillStyle = timerState === 'running' ? color : 'rgba(0,0,0,0.2)';
+  timerCtx.font = `900 ${fontSize}px -apple-system, sans-serif`;
+  timerCtx.textAlign    = 'center';
+  timerCtx.textBaseline = 'middle';
+  timerCtx.fillText(remaining.toFixed(1), 0, remaining < 1 ? -2 : 0);
+
+  // Sub-label "SEC" below the number
+  timerCtx.fillStyle = remaining < 1 ? color : 'rgba(0,0,0,0.25)';
+  timerCtx.font = `600 9px -apple-system, sans-serif`;
+  timerCtx.fillText('SEC', 0, remaining < 1 ? 14 : 13);
+  timerCtx.restore();
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ACCURACY CALCULATION
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function calcAccuracy() {
-  const drawn = G.drawn;
-  const tmpl  = G.template;
-  const size  = G.size;
-
-  if (drawn.length < 15) return 0;
-
-  const thresh = size * 0.065; // 타이트한 근접 기준
-
-  // ── 1. Coverage: 템플릿을 얼마나 넓게 커버했나 (이진 hit) ──
-  const SEG  = 8;
-  const nSeg = Math.ceil(tmpl.length / SEG);
-  const hit  = new Set();
-  for (const dp of drawn) {
-    for (let i = 0; i < tmpl.length; i++) {
-      if (Math.hypot(dp.x - tmpl[i].x, dp.y - tmpl[i].y) < thresh)
-        hit.add(Math.floor(i / SEG));
-    }
-  }
-  const coverage = hit.size / nSeg; // 0..1
-
-  // ── 2. Precision: 그린 선이 얼마나 경로에 가까운가 (연속 거리 기반) ──
-  const maxDist = thresh * 2.8;
-  let precSum = 0;
-  for (const dp of drawn) {
-    let minD = Infinity;
-    for (const tp of tmpl) {
-      const d = Math.hypot(dp.x - tp.x, dp.y - tp.y);
-      if (d < minD) minD = d;
-      if (minD < 2) break; // 충분히 가까우면 조기 종료
-    }
-    precSum += Math.max(0, 1 - minD / maxDist);
-  }
-  const precision = precSum / drawn.length; // 0..1
-
-  // ── 3. Direction: 올바른 순서(위→아래)로 그렸나 ──
-  const step = Math.max(1, Math.floor(drawn.length / 10));
-  let ordered = 0, checks = 0;
-  // 각 drawn 포인트에서 가장 가까운 tmpl 인덱스 찾기 (샘플링)
-  const tIdx = [];
-  for (let i = 0; i < drawn.length; i += step) {
-    let minD = Infinity, best = 0;
-    for (let j = 0; j < tmpl.length; j++) {
-      const d = Math.hypot(drawn[i].x - tmpl[j].x, drawn[i].y - tmpl[j].y);
-      if (d < minD) { minD = d; best = j; }
-    }
-    tIdx.push(best);
-  }
-  for (let k = 1; k < tIdx.length; k++) {
-    if (tIdx[k] >= tIdx[k - 1] - 15) ordered++;
-    checks++;
-  }
-  const direction = checks > 0 ? ordered / checks : 0.5; // 0..1
-
-  // ── 4. Start / End 근접 보너스 ──
-  const f = drawn[0], l = drawn[drawn.length - 1];
-  const ts = tmpl[0],  te = tmpl[tmpl.length - 1];
-  const mxD = size * 0.20;
-  const sOk = Math.hypot(f.x - ts.x, f.y - ts.y) < mxD;
-  const eOk = Math.hypot(l.x - te.x, l.y - te.y) < mxD;
-  const bonus = (sOk && eOk) ? 1.0 : (sOk || eOk) ? 0.5 : 0.0;
-
-  // ── 가중 합산 + power curve (고득점일수록 극도로 어렵게) ──
-  const raw = coverage * 0.35 + precision * 0.42 + direction * 0.13 + bonus * 0.10;
-  const score = Math.pow(Math.max(0, raw), 2.5) * 99.5;
-  return Math.max(1, Math.min(99.5, score));
+/* Strip bar render */
+function renderTimerStrip(progress) {
+  const strip = document.getElementById('timer-strip');
+  strip.style.width = (progress * 100) + '%';
+  // Color class
+  strip.classList.remove('urgent', 'critical');
+  if (progress < 0.167)      strip.classList.add('critical'); // < 0.5s
+  else if (progress < 0.333) strip.classList.add('urgent');   // < 1s
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// FINISH DRAW → RESULT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/* Canvas border glow + shake + vignette + text updates */
+function renderTimerEffects(remaining, progress) {
+  const wrap   = document.getElementById('canvas-wrap');
+  const status = document.getElementById('timer-status');
+  const msg    = document.getElementById('timer-msg');
+  const hint   = document.getElementById('timer-hint');
+
+  if (remaining > 2.0) {
+    // Green zone — calm
+    wrap.style.boxShadow = '0 0 0 2px rgba(20,194,90,0.4)';
+    wrap.classList.remove('shake-soft', 'shake-hard', 'vignette-pulse');
+    status.style.color = '#14C25A';
+    status.textContent = '⚡ 그리는 중';
+    msg.style.color    = '#14C25A';
+    msg.textContent    = '천천히 S를 그려보세요';
+    hint.textContent   = '손을 떼면 자동 완성';
+  } else if (remaining > 1.2) {
+    // Amber — slight urgency
+    const t = (2.0 - remaining) / 0.8;
+    const alpha = 0.3 + t * 0.3;
+    wrap.style.boxShadow = `0 0 0 ${2+t*2}px rgba(245,158,11,${alpha}), 0 0 ${10+t*15}px rgba(245,158,11,${alpha*0.5})`;
+    wrap.classList.remove('shake-soft', 'shake-hard', 'vignette-pulse');
+    status.style.color = '#F59E0B';
+    status.textContent = '🔥 서두르세요!';
+    msg.style.color    = '#F59E0B';
+    msg.textContent    = '빠르게 S를 완성하세요!';
+    hint.textContent   = '손을 떼면 자동 완성';
+  } else if (remaining > 0.5) {
+    // Red — urgent
+    const pulse = 0.5 + 0.5 * Math.sin(remaining * Math.PI * 10);
+    const glow  = 15 + 20 * pulse;
+    wrap.style.boxShadow = `0 0 0 3px rgba(232,0,28,0.9), 0 0 ${glow}px rgba(232,0,28,0.6)`;
+    wrap.classList.add('shake-soft');
+    wrap.classList.remove('shake-hard', 'vignette-pulse');
+    status.style.color = '#E8001C';
+    status.textContent = '🚨 위험!';
+    msg.style.color    = '#E8001C';
+    msg.textContent    = '빨리! 거의 끝났어요!';
+    hint.textContent   = '지금 당장 손 떼세요!';
+    // App-level vignette
+    document.getElementById('app').classList.remove('vignette-pulse');
+    document.getElementById('app').style['--vdur'] = '.25s';
+    document.getElementById('app').classList.add('vignette-pulse');
+  } else {
+    // Critical — < 0.5s
+    const fastPulse = Math.sin(remaining * Math.PI * 25);
+    const glowSize  = 20 + 30 * Math.abs(fastPulse);
+    wrap.style.boxShadow = `0 0 0 4px rgba(232,0,28,1), 0 0 ${glowSize}px rgba(232,0,28,0.8)`;
+    wrap.classList.remove('shake-soft');
+    wrap.classList.add('shake-hard');
+    document.getElementById('app').style['--vdur'] = '.12s';
+    document.getElementById('app').classList.add('vignette-pulse');
+    status.style.color = '#E8001C';
+    status.textContent = '💀 0초!';
+    msg.style.color    = '#E8001C';
+    msg.textContent    = '손 놔요!!! ⚡';
+  }
+}
+
+/* Render idle state (before drawing starts) */
+function renderTimerIdle() {
+  timerCtx.clearRect(0, 0, 100, 100);
+
+  // Gentle pulsing ring
+  const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
+
+  // Track
+  timerCtx.beginPath();
+  timerCtx.arc(CX, CY, RADIUS, 0, Math.PI * 2);
+  timerCtx.strokeStyle = `rgba(0,0,0,${0.06 + 0.04 * pulse})`;
+  timerCtx.lineWidth = 8;
+  timerCtx.stroke();
+
+  // Full ring in muted color
+  timerCtx.beginPath();
+  timerCtx.arc(CX, CY, RADIUS, 0, Math.PI * 2);
+  timerCtx.strokeStyle = `rgba(20,194,90,${0.25 + 0.15 * pulse})`;
+  timerCtx.lineWidth = 8;
+  timerCtx.stroke();
+
+  // Number
+  timerCtx.fillStyle = `rgba(0,0,0,${0.3 + 0.1 * pulse})`;
+  timerCtx.font = '900 22px -apple-system, sans-serif';
+  timerCtx.textAlign = 'center'; timerCtx.textBaseline = 'middle';
+  timerCtx.fillText(GS.DRAW_TIME.toFixed(1), CX, CY - 2);
+  timerCtx.font = '600 9px -apple-system, sans-serif';
+  timerCtx.fillText('SEC', CX, CY + 12);
+
+  if (timerState === 'idle') requestAnimationFrame(renderTimerIdle);
+}
+
+function resetTimerVisuals() {
+  const wrap = document.getElementById('canvas-wrap');
+  wrap.style.boxShadow = '';
+  wrap.classList.remove('shake-soft', 'shake-hard', 'vignette-pulse');
+  document.getElementById('app').classList.remove('vignette-pulse');
+  document.getElementById('timer-status').textContent = '터치하면 시작';
+  document.getElementById('timer-status').style.color = '';
+  document.getElementById('timer-msg').textContent = 'S를 그리세요';
+  document.getElementById('timer-msg').style.color = '';
+  document.getElementById('timer-hint').textContent = '손을 떼면 자동 완성';
+  document.getElementById('timer-strip').style.width = '100%';
+  document.getElementById('timer-strip').classList.remove('urgent','critical');
+  timerState = 'idle';
+  timerStart = null;
+  requestAnimationFrame(renderTimerIdle);
+}
+
+/* Time's up */
+function handleTimeUp() {
+  resetTimerVisuals();
+  if (GS.pts.length >= 20) {
+    // Submit what they drew
+    finishDraw();
+  } else {
+    // Too little drawn — show timeout flash and reset
+    showTimesUpFlash();
+    setTimeout(() => {
+      GS.pts = []; GS.done = false;
+      redraw();
+    }, 700);
+  }
+}
+
+function showTimesUpFlash() {
+  const flash = document.getElementById('timesup-flash');
+  flash.classList.add('show');
+  setTimeout(() => flash.classList.remove('show'), 700);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCORING
+══════════════════════════════════════════════════════════════ */
+function d2(a, b) { return Math.hypot(a[0]-b[0], a[1]-b[1]); }
+
+function resample(pts, n) {
+  if (pts.length < 2) return pts;
+  let tot = 0;
+  for (let i = 1; i < pts.length; i++) tot += d2(pts[i], pts[i-1]);
+  const step = tot / n;
+  const out  = [[...pts[0]]];
+  let acc = 0, prev = [...pts[0]], i = 1;
+  while (out.length <= n && i < pts.length) {
+    const dd = d2(pts[i], prev);
+    if (acc + dd >= step) {
+      const t = (step-acc)/dd;
+      const p = [prev[0]+t*(pts[i][0]-prev[0]), prev[1]+t*(pts[i][1]-prev[1])];
+      out.push(p); prev = p; acc = 0;
+    } else { acc += dd; prev=[...pts[i]]; i++; }
+  }
+  while (out.length <= n) out.push([...pts[pts.length-1]]);
+  return out;
+}
+
+function normalize(pts) {
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  pts.forEach(([x,y]) => { x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y); });
+  const cx=(x0+x1)/2, cy=(y0+y1)/2, sc=Math.max(x1-x0,y1-y0,1);
+  return pts.map(([x,y]) => [(x-cx)/sc,(y-cy)/sc]);
+}
+
+function avgDist(a, b) {
+  const n=Math.min(a.length,b.length), rev=[...b].reverse();
+  let sf=0,sr=0;
+  for (let i=0;i<n;i++) { sf+=d2(a[i],b[i]); sr+=d2(a[i],rev[i]); }
+  return Math.min(sf,sr)/n;
+}
+
+function calcScore() {
+  const pts = GS.pts;
+  if (pts.length < 20) return 0;
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  pts.forEach(([x,y]) => { x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y); });
+  if (Math.max(x1-x0,y1-y0) < 60) return 5;
+  const N=100, ref=REF[GS.level];
+  const uN=normalize(resample(pts,N)), rN=normalize(resample(ref,N));
+  const sim=Math.max(0,1-avgDist(uN,rN)*3.0);
+  let angleSum=0;
+  for (let i=2;i<pts.length;i++) {
+    const [ax,ay]=[pts[i-1][0]-pts[i-2][0],pts[i-1][1]-pts[i-2][1]];
+    const [bx,by]=[pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]];
+    angleSum+=Math.abs(Math.atan2(Math.abs(ax*by-ay*bx),ax*bx+ay*by));
+  }
+  const smooth=Math.max(0,1-(angleSum/(pts.length-2))*0.7);
+  return Math.round(Math.min(99,Math.max(1,(sim*0.82+smooth*0.18)*100)));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRADE / PERCENTILE
+══════════════════════════════════════════════════════════════ */
+function getGrade(s) {
+  if (s>=97) return {label:'신의 손 ✦',    desc:'완벽에 가까운 S예요! 대단해요!'};
+  if (s>=90) return {label:'환상적이에요 ◎', desc:'조금만 더 완벽하게 그려보세요'};
+  if (s>=80) return {label:'잘 그렸어요 ○',  desc:'점점 완벽해지고 있어요!'};
+  if (s>=65) return {label:'좋아요 ◉',      desc:'조금만 더 연습해보세요'};
+  if (s>=50) return {label:'아쉬워요 ◌',    desc:'S를 천천히 따라 그려보세요'};
+  return          {label:'도전! ∿',          desc:'가이드 선을 따라 그려보세요'};
+}
+
+function getPercentile(score) {
+  function erf(x) {
+    const t=1/(1+0.3275911*Math.abs(x));
+    const p=t*(0.254829592+t*(-0.284496736+t*(1.421413741+t*(-1.453152027+t*1.061405429))));
+    return (x>=0?1:-1)*(1-p*Math.exp(-x*x));
+  }
+  const cdf=0.5*(1+erf((score-60)/(14*Math.SQRT2)));
+  return Math.max(1,Math.min(99,Math.round((1-cdf)*100)));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCREEN MANAGER
+══════════════════════════════════════════════════════════════ */
+let curScreen='welcome';
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('screen-'+id).classList.remove('hidden');
+  curScreen=id;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GOOGLE RewardedInterstitialAd
+══════════════════════════════════════════════════════════════ */
+let rewardedInterstitialAd=null;
+let adInterval=null, adElapsed=0;
+
+function loadRewardedInterstitialAd(onLoaded, onFailed) {
+  setTimeout(() => {
+    if (Math.random()>0.03) {
+      rewardedInterstitialAd = {
+        _fsCb: null,
+        setFullScreenContentCallback(cb) { this._fsCb=cb; },
+        show(ctx, rl) {
+          this._fsCb?.onAdShowedFullScreenContent();
+          this._fsCb?.onAdImpression();
+          runAdPlayback(this, rl);
+        }
+      };
+      onLoaded(rewardedInterstitialAd);
+    } else {
+      rewardedInterstitialAd=null;
+      onFailed({getMessage:()=>'Network error'});
+    }
+  }, 550);
+}
+
+function runAdPlayback(ad, rl) {
+  adElapsed=0; const total=GS.AD_DURATION_S;
+  document.getElementById('ad-bar').style.width='0%';
+  document.getElementById('ad-timer-lbl').textContent=total+'초 남음';
+  document.getElementById('ad-skip-btn').classList.remove('show');
+  clearInterval(adInterval);
+  adInterval=setInterval(()=>{
+    adElapsed++;
+    const pct=Math.min((adElapsed/total)*100,100);
+    document.getElementById('ad-bar').style.width=pct+'%';
+    document.getElementById('ad-timer-lbl').textContent=Math.max(0,total-adElapsed)+'초 남음';
+    if (adElapsed>=total) {
+      clearInterval(adInterval);
+      document.getElementById('ad-skip-btn').classList.add('show');
+      rl.onUserEarnedReward({getAmount:()=>2,getType:()=>'play'});
+    }
+  },1000);
+}
+
+function handleAdClick() { rewardedInterstitialAd?._fsCb?.onAdClicked?.(); }
+function skipAd() { if (adElapsed<GS.AD_DURATION_S) return; dismissAd(); }
+
+function dismissAd() {
+  clearInterval(adInterval);
+  rewardedInterstitialAd?._fsCb?.onAdDismissedFullScreenContent?.();
+  rewardedInterstitialAd=null;
+}
+
+function requestAd(from) {
+  if (!canWatchAd()) return;
+  GS.adCalledFrom=from;
+  showScreen('ad');
+  loadRewardedInterstitialAd(
+    (ad) => {
+      ad.setFullScreenContentCallback({
+        onAdDismissedFullScreenContent(){},
+        onAdFailedToShowFullScreenContent(){ rewardedInterstitialAd=null; returnFromAd(); },
+        onAdShowedFullScreenContent(){},
+        onAdImpression(){},
+        onAdClicked(){}
+      });
+      ad.show(null,{
+        onUserEarnedReward(ri) {
+          GS.adsToday++; GS.lastAdMs=Date.now(); GS.attempts+=ri.getAmount();
+          dismissAd();
+          showRewardToast(()=>returnFromAd());
+        }
+      });
+    },
+    ()=>returnFromAd()
+  );
+}
+
+function canWatchAd() {
+  return GS.adsToday<GS.MAX_ADS_DAY && (!GS.lastAdMs||Date.now()-GS.lastAdMs>=GS.AD_COOLDOWN_MS);
+}
+function showRewardToast(cb) {
+  const t=document.getElementById('reward-toast');
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show'); cb();},2200);
+}
+function returnFromAd() {
+  updateUI();
+  if (GS.adCalledFrom==='result') retryFromResult();
+  else { showScreen('game'); resetCanvas(); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UI
+══════════════════════════════════════════════════════════════ */
+function renderTries() {
+  const row=document.getElementById('tries-row');
+  row.innerHTML='';
+  if (GS.attempts===0) { row.innerHTML='<span class="tries-zero">참여 기회가 없어요</span>'; return; }
+  const show=Math.min(GS.attempts,8);
+  for (let i=0;i<show;i++) { const d=document.createElement('div'); d.className='try-dot'; row.appendChild(d); }
+  if (GS.attempts>8) { const s=document.createElement('span'); s.style.cssText='font-size:12px;color:var(--muted);margin-left:4px'; s.textContent='+'+( GS.attempts-8); row.appendChild(s); }
+}
+function updateAdButtons() {
+  const ok=canWatchAd(); const now=Date.now();
+  let txt='광고 보고';
+  if (GS.adsToday>=GS.MAX_ADS_DAY) txt='오늘 광고 한도 도달 (4/4)';
+  else if (GS.lastAdMs&&now-GS.lastAdMs<GS.AD_COOLDOWN_MS) txt=Math.ceil((GS.AD_COOLDOWN_MS-(now-GS.lastAdMs))/60000)+'분 후 광고 가능';
+  ['game','result'].forEach(id=>{
+    const btn=document.getElementById('btn-ad-'+id);
+    const el=document.getElementById('ad-btn-txt-'+id);
+    if(btn) btn.disabled=!ok; if(el) el.textContent=txt;
+  });
+}
+function updateUI() {
+  document.getElementById('hdr-tries').textContent=GS.attempts;
+  const best=GS.personalBest[GS.level];
+  document.getElementById('hdr-best').textContent=best!==null?best+'점':'—';
+  renderTries(); updateAdButtons();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CANVAS EVENTS
+══════════════════════════════════════════════════════════════ */
+function onStart(e) {
+  if (GS.done||curScreen!=='game') return;
+  if (GS.attempts<=0) {
+    const b=document.getElementById('btn-ad-game');
+    b.style.borderColor='var(--red)'; setTimeout(()=>b.style.borderColor='',700);
+    return;
+  }
+  e.preventDefault();
+  GS.drawing=true;
+  GS.pts=[getPos(e)];
+  // Start timer on first touch
+  if (timerState==='idle') startTimer();
+  redraw();
+}
+function onMove(e) {
+  if (!GS.drawing||GS.done) return;
+  e.preventDefault();
+  GS.pts.push(getPos(e));
+}
+function onEnd(e) {
+  if (!GS.drawing||curScreen!=='game') return;
+  GS.drawing=false;
+  if (GS.pts.length>=20) {
+    stopTimer();
+    finishDraw();
+  } else {
+    GS.pts=[]; GS.done=false; redraw();
+  }
+}
+canvas.addEventListener('mousedown',  onStart);
+canvas.addEventListener('mousemove',  onMove);
+canvas.addEventListener('mouseup',    onEnd);
+canvas.addEventListener('mouseleave', e=>{if(GS.drawing)onEnd(e);});
+canvas.addEventListener('touchstart', onStart,{passive:false});
+canvas.addEventListener('touchmove',  onMove, {passive:false});
+canvas.addEventListener('touchend',   onEnd);
+
+/* ══════════════════════════════════════════════════════════════
+   GAME FLOW
+══════════════════════════════════════════════════════════════ */
+function startGame() { showScreen('game'); resetCanvas(); updateUI(); }
+
+function resetCanvas() {
+  GS.pts=[]; GS.drawing=false; GS.done=false; GS.lastScore=0;
+  redraw();
+  resetTimerVisuals();
+  document.getElementById('draw-hint').style.opacity='1';
+}
+
 function finishDraw() {
-  const score = calcAccuracy();
-  G.currentScore = score;
-  stopBGM();
-  showResult(score);
+  GS.done=true;
+  const score=calcScore();
+  GS.lastScore=score; GS.attempts--; GS.totalTrials++;
+  redraw();
+  setTimeout(()=>showResult(score),380);
 }
 
 function showResult(score) {
-  const isHigh = score > topScore();
-  addScore(score);
-  // 인터스티셜 광고 (결과 화면 전환 시)
-  adBreak({
-    type:     'next',
-    name:     'game-complete',
-    beforeAd: () => {},
-    afterAd:  () => { renderResult(score, isHigh); },
-  });
-}
+  const best=GS.personalBest[GS.level];
+  const isNew=best===null||score>best;
+  if (isNew) GS.personalBest[GS.level]=score;
+  GS.pendingLevelUp=(score>=GS.LEVEL_UP_SCORE&&GS.level<2);
 
-function renderResult(score, isHigh) {
-  // Score text
-  const el = document.getElementById('r-score');
-  el.textContent = score.toFixed(2) + '%';
-  el.className   = 't-score score-reveal';
-  void el.offsetWidth; // reflow
+  showScreen('result');
 
-  // Message
-  const msg =
-    score >= 95 ? '완벽해요! 당신은 SK 홍보대사 아닌가요? 👑' :
-    score >= 85 ? '훌륭해요! 거의 완벽에 가까워요 🔥' :
-    score >= 70 ? '잘 그렸어요! 한 번 더 하면 완벽해요 ✨' :
-    score >= 50 ? '좋은 시작이에요! 다시 도전해봐요 💪' :
-    '조금 더 연습이 필요해요 🎯';
-  document.getElementById('r-msg').textContent = msg;
+  // Count-up
+  const numEl=document.getElementById('score-number');
+  numEl.style.color=scoreColor(score);
+  const t0=Date.now(),dur=900;
+  (function tick(){
+    const p=Math.min((Date.now()-t0)/dur,1);
+    numEl.textContent=Math.round(score*(1-Math.pow(1-p,3)));
+    if(p<1) requestAnimationFrame(tick); else numEl.textContent=score;
+  })();
 
-  // New record badge
-  document.getElementById('r-newrec').style.display = isHigh ? '' : 'none';
+  animateRing(score,scoreColor(score));
 
-  // SVG icon animation
-  animateSvgResult(score);
+  const badge=document.getElementById('record-badge');
+  const badgeTxt=document.getElementById('record-badge-txt');
+  if (isNew) {
+    const lucky=Math.random()<0.12;
+    badgeTxt.textContent=lucky?'🎊 행운의 보너스! +5원 적립!':'🎉 최고기록 갱신! +1원 적립';
+    badge.classList.add('show');
+    setTimeout(()=>spawnCoins(),500);
+    if(lucky)spawnConfetti();
+  } else badge.classList.remove('show');
 
-  // Share canvas
-  buildShareCanvas(score);
-
-  // Retry button
-  refreshRetryBtn();
-
-  go('result');
-
-  if (isHigh)        { sfx('great');   setTimeout(() => showCelebration(score), 400); }
-  else if (score>=70){ sfx('success'); }
-  else               { sfx('fail');    }
-}
-
-function animateSvgResult(score) {
-  const ring  = document.getElementById('r-ring');
-  const check = document.getElementById('r-check');
-  const cross = document.getElementById('r-cross');
-  const circ  = 2 * Math.PI * 28; // ~176
-
-  // Ring fills proportionally
-  setTimeout(() => {
-    ring.style.strokeDashoffset = circ * (1 - score / 100);
-  }, 100);
-
-  if (score >= 60) {
-    cross.style.display = 'none';
-    check.style.display = '';
-    check.style.animation = 'drawCheck 0.6s ease 0.5s both';
+  const gapHint = document.getElementById('record-gap-hint');
+  const gapTxt  = document.getElementById('record-gap-txt');
+  if (!isNew && best !== null) {
+    const gap = best - score;
+    gapTxt.textContent = `내 기록 경신까지 ${gap}점!`;
+    gapHint.classList.add('show');
   } else {
-    check.style.display = 'none';
-    cross.style.display = '';
-    cross.style.animation = 'drawCheck 0.5s ease 0.4s both';
-  }
-}
-
-function refreshRetryBtn() {
-  const r   = remaining();
-  const btn = document.getElementById('btn-retry');
-  if (r > 0) {
-    btn.textContent = `🔄 다시 도전 (${r}회)`;
-    btn.style.color   = 'rgba(255,255,255,0.85)';
-    btn.style.fontWeight = '700';
-    btn.disabled = false;
-  } else {
-    btn.textContent = '기회 소진 😢';
-    btn.style.color = 'var(--mut)';
-    btn.disabled    = true;
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SHARE CANVAS (240×240)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function buildShareCanvas(score) {
-  const sc   = document.getElementById('share-canvas');
-  const sctx = sc.getContext('2d');
-  const W = 200, H = 200;
-
-  // BG
-  const bg = sctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#080818'); bg.addColorStop(1, '#14082C');
-  sctx.fillStyle = bg; sctx.fillRect(0, 0, W, H);
-
-  // Radial glow
-  const glow = sctx.createRadialGradient(W/2, H*0.38, 0, W/2, H*0.38, 75);
-  glow.addColorStop(0, 'rgba(232,0,61,0.22)'); glow.addColorStop(1, 'transparent');
-  sctx.fillStyle = glow; sctx.fillRect(0, 0, W, H);
-
-  // SK text
-  sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
-  sctx.font = 'bold 60px sans-serif';
-  sctx.fillStyle = '#E8003D'; sctx.fillText('S', W * 0.36, H * 0.34);
-  sctx.fillStyle = 'rgba(255,255,255,0.18)'; sctx.fillText('K', W * 0.64, H * 0.34);
-
-  // Score
-  sctx.font = 'bold 34px sans-serif';
-  sctx.fillStyle = '#ffffff';
-  sctx.fillText(score.toFixed(2) + '%', W/2, H * 0.62);
-
-  // Sub
-  sctx.font = '500 13px sans-serif';
-  sctx.fillStyle = 'rgba(255,255,255,0.40)';
-  sctx.fillText('S자 챌린지', W/2, H * 0.78);
-
-  // Brand
-  sctx.font = '700 10px sans-serif';
-  sctx.fillStyle = 'rgba(255,255,255,0.18)';
-  sctx.fillText('SK S Challenge', W/2, H * 0.92);
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// CELEBRATION
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function showCelebration(score) {
-  document.getElementById('cel-score').textContent = score.toFixed(2) + '%';
-  openOv('cel');
-  launchConfetti();
-}
-
-function launchConfetti() {
-  const box    = document.getElementById('confetti');
-  const colors = ['#E8003D','#FF4D6D','#FFD700','#FF9F3F','#FFFFFF','#FF6B6B'];
-  box.innerHTML = '';
-  for (let i = 0; i < 70; i++) {
-    const el = document.createElement('div');
-    el.className = 'cf';
-    const size = 5 + Math.random() * 7;
-    el.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}vw;
-      background:${colors[i % colors.length]};
-      border-radius:${Math.random()>.5?'50%':'3px'};
-      animation: cfFall ${1.5+Math.random()*2}s ${Math.random()*0.9}s ease-out forwards;
-    `;
-    box.appendChild(el);
-  }
-  // Inject cfFall keyframes once
-  if (!document.getElementById('cf-style')) {
-    const style = document.createElement('style');
-    style.id = 'cf-style';
-    style.textContent = `
-      @keyframes cfFall {
-        0%   { transform: translateY(-30px) rotate(0deg);   opacity: 1; }
-        100% { transform: translateY(110vh) rotate(750deg); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  setTimeout(() => { box.innerHTML = ''; }, 4500);
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// LEADERBOARD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// COUNTDOWN
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function countdown(cb) {
-  go('countdown');
-  let n = 3;
-  const el = document.getElementById('cd-num');
-
-  function tick() {
-    el.textContent  = n > 0 ? n : 'GO!';
-    el.style.color  = n > 0 ? 'var(--p)' : '#FFD700';
-    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-    if (n > 0) sfx('tick'); else sfx('go');
-    if (n <= 0) { setTimeout(cb, 550); return; }
-    n--; setTimeout(tick, 900);
-  }
-  tick();
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// INTRO REFRESH
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function refreshIntro() {
-  const r      = remaining();
-  const ctr    = document.getElementById('intro-dots');
-  const emp    = document.getElementById('intro-empty');
-  const btn    = document.getElementById('btn-start');
-  const adBtn  = document.getElementById('btn-ad-intro');
-
-  ctr.innerHTML = '';
-  const total = Math.max(3, r);
-  for (let i = 0; i < total; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i < r ? '' : ' off');
-    ctr.appendChild(d);
+    gapHint.classList.remove('show');
   }
 
-  if (r <= 0) {
-    // 기회 소진: 도전 버튼 숨기고 광고 버튼 표시
-    btn.style.display   = 'none';
-    adBtn.style.display = '';
-    emp.style.display   = '';
-    emp.textContent     = '광고를 보면 2회 더 도전할 수 있어요!';
-  } else {
-    btn.style.display   = '';
-    btn.disabled        = false;
-    btn.style.opacity   = '1';
-    adBtn.style.display = 'none';
-    emp.style.display   = 'none';
-  }
+  const {label,desc}=getGrade(score);
+  document.getElementById('grade-label').textContent=label;
+  document.getElementById('grade-desc').textContent=desc;
+  document.getElementById('rank-pct').textContent=getPercentile(score);
+  document.getElementById('result-tries-txt').textContent='남은 기회 '+GS.attempts+'회';
+  document.getElementById('btn-retry').disabled=GS.attempts<=0;
+  updateAdButtons();
+  if(GS.pendingLevelUp) setTimeout(()=>showScreen('levelup'),2200);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// AD FLOW
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function runAd() {
-  let t = 5;
-  const numEl  = document.getElementById('ad-num');
-  const progEl = document.getElementById('ad-prog');
-  const doneEl = document.getElementById('btn-ad-done');
-  numEl.textContent  = t;
-  progEl.style.width = '0%';
-  doneEl.disabled    = true;
-  doneEl.textContent = '시청 완료 후 활성화돼요';
+function retryFromResult() {
+  if (GS.attempts<=0) return;
+  showScreen('game'); resetCanvas(); updateUI();
+}
 
-  clearInterval(G.adTimer);
-  G.adTimer = setInterval(() => {
-    t--;
-    numEl.textContent  = t > 0 ? t : '✓';
-    progEl.style.width = ((5 - t) / 5 * 100) + '%';
-    if (t <= 0) {
-      clearInterval(G.adTimer);
-      doneEl.disabled    = false;
-      doneEl.textContent = '✓ 완료! 2회 추가 받기';
-      sfx('success');
+/* ══════════════════════════════════════════════════════════════
+   SCORE RING
+══════════════════════════════════════════════════════════════ */
+function animateRing(score,color) {
+  const c=document.getElementById('ring-canvas'),rc=c.getContext('2d');
+  const cx=95,cy=95,r=82,target=score/100;
+  let prog=0; const t0=Date.now(),dur=900;
+  (function draw(){
+    rc.clearRect(0,0,190,190);
+    rc.beginPath(); rc.arc(cx,cy,r,0,Math.PI*2);
+    rc.strokeStyle='rgba(0,0,0,0.07)'; rc.lineWidth=9; rc.stroke();
+    if(prog>0){
+      rc.beginPath(); rc.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2);
+      rc.strokeStyle=color; rc.lineWidth=9; rc.lineCap='round'; rc.stroke();
     }
-  }, 1000);
+    const p=Math.min((Date.now()-t0)/dur,1);
+    prog=target*(1-Math.pow(1-p,3));
+    if(p<1) requestAnimationFrame(draw);
+  })();
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// START GAME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function startGame() {
-  if (remaining() <= 0) return;
-  consume();
-  countdown(() => {
-    go('game');
-    setTimeout(() => {
-      setupCanvas();
-      bindCanvas();
-      startBGM();
-      renderGameBest(); // 최고 기록 + 응원 멘트
-    }, 120);
+/* ══════════════════════════════════════════════════════════════
+   EFFECTS
+══════════════════════════════════════════════════════════════ */
+function spawnCoins() {
+  const el=document.getElementById('screen-result');
+  ['💰','🪙','✨'].forEach((icon,idx)=>{
+    for(let i=0;i<3;i++){
+      const d=document.createElement('div'); d.className='coin-burst'; d.textContent=icon;
+      d.style.cssText=`left:${28+Math.random()*44}%;top:${33+Math.random()*18}%;--tx:${(Math.random()-.5)*130}px;--ty:${-38-Math.random()*65}px;animation-delay:${(idx*3+i)*.055}s`;
+      el.appendChild(d); setTimeout(()=>d.remove(),1300);
+    }
   });
 }
-
-function renderGameBest() {
-  const best    = topScore();
-  const scoreEl = document.getElementById('game-best-score');
-  const msgEl   = document.getElementById('game-best-msg');
-  const msgs0   = ['첫 기록을 세워보세요! 🔥', '지금 바로 도전! 최고 기록의 주인공이 되세요 ✨'];
-  const msgs    = [
-    '이번엔 꼭 경신해봐요! 💪',
-    '조금만 더 집중하면 갱신할 수 있어요 🎯',
-    '한 획의 차이! 더 정밀하게 그려보세요 ✍️',
-    '최고 기록 경신까지 한 걸음! 힘내요 🚀',
-    '지금이 바로 기록 경신의 순간 ⚡',
-    '천천히, 그리고 정확하게! 할 수 있어요 🌟',
-  ];
-  if (!best) {
-    scoreEl.textContent = '--';
-    msgEl.textContent   = msgs0[Math.floor(Math.random() * msgs0.length)];
-  } else {
-    scoreEl.textContent = best.toFixed(2) + '%';
-    msgEl.textContent   = msgs[Math.floor(Math.random() * msgs.length)];
+function spawnConfetti() {
+  const el=document.getElementById('screen-result');
+  const cols=['#E8001C','#FF6B35','#14C25A','#3B82F6','#F59E0B'];
+  for(let i=0;i<28;i++){
+    const d=document.createElement('div'); d.className='confetti-piece';
+    d.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*30}%;background:${cols[i%5]};--tx:${(Math.random()-.5)*210}px;--rot:${Math.random()*720}deg;--dur:${.8+Math.random()}s;animation-delay:${Math.random()*.4}s`;
+    el.appendChild(d); setTimeout(()=>d.remove(),2100);
   }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SHARE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function doShare() {
-  const sc    = document.getElementById('share-canvas');
-  const score = G.currentScore;
-  const text  = `내 S자 정확도: ${score.toFixed(2)}% 🔥 당신도 도전해봐!\nhttps://sks-challenge.com`;
-
-  if (navigator.share) {
-    sc.toBlob(blob => {
-      const file = new File([blob], 'sk-s-challenge.png', { type: 'image/png' });
-      const data = { title: 'SK S챌린지', text };
-      if (navigator.canShare && navigator.canShare({ files: [file] }))
-        data.files = [file];
-      navigator.share(data).then(() => {
-        addExtra(1);
-        refreshRetryBtn();
-        refreshIntro();
-        // 공유 완료 후 버튼 피드백
-        const btn = document.getElementById('btn-share');
-        btn.innerHTML = '<span style="font-size:18px;">✅</span><span style="font-size:15px;font-weight:700;">공유 완료! +1회 추가</span>';
-        setTimeout(() => {
-          btn.innerHTML = '<span style="font-size:18px;">📤</span><span style="font-size:15px;font-weight:700;">친구에게 공유하기</span><span style="font-size:11px;font-weight:400;opacity:0.55;margin-left:2px;">+1회</span>';
-        }, 2500);
-      }).catch(() => {});
-    });
-  } else {
-    navigator.clipboard?.writeText(text).then(() => {
-      const btn = document.getElementById('btn-share');
-      btn.innerHTML = '<span style="font-size:18px;">✅</span><span style="font-size:15px;font-weight:700;">링크 복사 완료! +1회 추가</span>';
-      addExtra(1);
-      refreshRetryBtn();
-      refreshIntro();
-      setTimeout(() => {
-        btn.innerHTML = '<span style="font-size:18px;">📤</span><span style="font-size:15px;font-weight:700;">친구에게 공유하기</span><span style="font-size:11px;font-weight:400;opacity:0.55;margin-left:2px;">+1회</span>';
-      }, 2500);
-    }).catch(() => {
-      alert('공유할 내용이 클립보드에 복사됐어요!\n\n' + text);
-    });
-  }
+/* ══════════════════════════════════════════════════════════════
+   LEVEL UP
+══════════════════════════════════════════════════════════════ */
+function goNextLevel() {
+  GS.level=2; GS.attempts+=3;
+  document.getElementById('level-num-txt').textContent='2';
+  document.getElementById('level-char-txt').textContent='K';
+  showScreen('game'); resetCanvas(); updateUI();
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// EVENT BINDINGS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// Intro
-document.getElementById('btn-start').addEventListener('click', () => {
-  initAudio(); startGame();
-});
-// Result
-document.getElementById('btn-retry').addEventListener('click', () => {
-  if (remaining() <= 0) return;
-  initAudio(); startGame();
-});
-
-// 보상형 광고 트리거 (인트로 + 결과 화면 공통)
-function triggerRewardedAd() {
-  initAudio();
-  openOv('ad');
-  runAd();
-  adBreak({
-    type:     'reward',
-    name:     'extra-attempts',
-    beforeAd: () => {},
-    afterAd:  () => {},
-    reward:   () => {
-      addExtra(2);
-      closeOv('ad');
-      clearInterval(G.adTimer);
-      sfx('great');
-      refreshRetryBtn();
-      refreshIntro();
-    },
-  });
-}
-document.getElementById('btn-ad-intro').addEventListener('click', triggerRewardedAd);
-document.getElementById('btn-ad').addEventListener('click',       triggerRewardedAd);
-
-// Ad modal — 수동 완료 버튼 (adBreak 미지원 환경 폴백)
-document.getElementById('btn-ad-done').addEventListener('click', () => {
-  addExtra(2);
-  closeOv('ad');
-  sfx('great');
-  refreshRetryBtn();
-  refreshIntro();
-});
-document.getElementById('btn-ad-cancel').addEventListener('click', () => {
-  clearInterval(G.adTimer); closeOv('ad');
-});
-
-// Celebration modal
-document.getElementById('btn-cel-ok').addEventListener('click', () => closeOv('cel'));
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// INIT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// 구 알고리즘으로 저장된 99.5% 초과 기록 자동 정리
-(function cleanLegacyScores() {
-  const s = getScores().filter(r => r.score <= 99.5);
-  localStorage.setItem('sk_scores', JSON.stringify(s));
-})();
-
-// 하단 배너 광고 초기화
-(adsbygoogle = window.adsbygoogle || []).push({});
-
-// H5 Games Ads 설정
-adConfig({ preloadAdBreaks: 'on', sound: 'off' });
-
-refreshIntro();
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
+initRef();
+showScreen('welcome');
 </script>
 </body>
 </html>
